@@ -19,3 +19,4 @@ const AccessPage: React.FC = () => {
 };
 
 export default AccessPage;
+
