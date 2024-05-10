@@ -3,10 +3,12 @@ package io.skydeck.gserver.impl;
 import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.SettlementBase;
-import io.skydeck.gserver.engine.SettlementEngine;
+import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.DamageNature;
+import lombok.Data;
 
-public class DamageSettlement implements SettlementBase {
+@Data
+public class DamageSettlement extends SettlementBase {
     private Player dealer;
     private Player sufferer;
     private CardBase card;
@@ -24,16 +26,16 @@ public class DamageSettlement implements SettlementBase {
     }
 
     @Override
-    public void resolve(SettlementEngine engine) {
+    public void resolve(GameEngine engine) {
         boolean valid = engine.onDealingDamage(this);
-        if (!valid) {
+        if (!valid || damageCount == 0) {
             return;
         }
         int health = sufferer.getHealth();
         sufferer.setHealth(health - damageCount);
         if (sufferer.getHealth() <= 0) {
-            DyingSettlement dyingSettlement = DyingSettlement.newOne(sufferer, dealer);
-            dyingSettlement.resolve(engine);
+            InDangerSettlement inDangerSettlement = InDangerSettlement.newOne(sufferer, dealer);
+            inDangerSettlement.resolve(engine);
         }
         engine.onDealtDamage(this);
     }

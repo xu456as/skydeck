@@ -16,4 +16,32 @@ public class CardFilterFactory {
     }
 
     public CardFilterIface cureFilter() {return (CardBase  card) -> card.subType() == CardSubType.Cure;}
+
+    public CardFilterIface liquorFilter() { return (CardBase card) -> card.subType() == CardSubType.Liquor; }
+
+    public CardFilterIface or(CardFilterIface...  filters) {
+        return (CardBase card)  -> {
+            for (CardFilterIface filter : filters) {
+                if (filter.filter(card)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+    }
+
+    public CardFilterIface and(CardFilterIface...  filters) {
+        return (CardBase card)  -> {
+            for (CardFilterIface filter : filters) {
+                if (!filter.filter(card)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
+    public CardFilterIface not(CardFilterIface filter) {
+        return (CardBase card)  -> !filter.filter(card);
+    }
 }

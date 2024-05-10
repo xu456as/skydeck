@@ -4,5 +4,5 @@ public enum CardType {
     None,
     Basic,
     Ploy,
-    Equipment;
+    Gear;
 }

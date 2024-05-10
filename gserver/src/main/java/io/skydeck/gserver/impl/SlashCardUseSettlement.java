@@ -1,13 +1,14 @@
 package io.skydeck.gserver.impl;
 
-import io.skydeck.gserver.domain.CardFilterIface;
 import io.skydeck.gserver.domain.CardSettlement;
 import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.QueryManager;
-import io.skydeck.gserver.engine.SettlementEngine;
+import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.util.PositionUtil;
+import lombok.Data;
+import lombok.Setter;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.*;
@@ -18,8 +19,18 @@ public class SlashCardUseSettlement extends CardSettlement {
     private Map<Player, Integer> jinkQueryCountMap = new HashMap<>();
 
     private Set<Player> jinkSuccessSet = new HashSet<>();
+
+    public static SlashCardUseSettlement newOne(CardUseDTO useDTO) {
+        SlashCardUseSettlement settlement = new SlashCardUseSettlement();
+        settlement.cardUseDTO =  useDTO;
+        return settlement;
+    }
+
+    @Setter
+    private boolean jinkInvalid = false;
+
     @Override
-    public void resolve(SettlementEngine engine) {
+    public void resolve(GameEngine engine) {
         QueryManager queryManager = engine.getQueryManager();
         CardFilterFactory cff = engine.getCardFilterFactory();
         engine.onCardUsing(cardUseDTO, this);
@@ -48,21 +59,30 @@ public class SlashCardUseSettlement extends CardSettlement {
                         validJink++;
                     }
                     if (validJink < jinkCount) {
-                        DamageSettlement damageSettlement = DamageSettlement.newOne(cardUseDTO.getPlayer(),
-                                target, damageCountMap.getOrDefault(target, 1),
-                                cardUseDTO.getCard().nature(), cardUseDTO.getCard());
-                        damageSettlement.resolve(engine);
+                        causeDamage(engine, target);
                     } else {
                         jinkSuccessSet.add(target);
+                        if (jinkInvalid)  {
+                            causeDamage(engine, target);
+                        }
                     }
                     engine.onCardEffected(cardUseDTO, this, target);
                 }
             }
         }
+        cardUseDTO.getPlayer().getStageState().setDrunk(false);
         engine.onCardEffectFinish(cardUseDTO, this);
         engine.onCardUsed(cardUseDTO, this);
         engine.onCardBurying(cardUseDTO, this);
         engine.onCardUsed(cardUseDTO, this);
+    }
+
+    private void causeDamage(GameEngine engine, Player target) {
+        int drunkDamage = (cardUseDTO.getPlayer().getStageState().getDrunk()) ? 1 : 0;
+        DamageSettlement damageSettlement = DamageSettlement.newOne(cardUseDTO.getPlayer(),
+                target, damageCountMap.getOrDefault(target, 1) + drunkDamage,
+                cardUseDTO.getCard().nature(), cardUseDTO.getCard());
+        damageSettlement.resolve(engine);
     }
 
     public boolean isJinkSuccess(Player target) {

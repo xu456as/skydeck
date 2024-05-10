@@ -2,38 +2,25 @@ package io.skydeck.gserver.impl;
 
 import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.SettlementBase;
-import io.skydeck.gserver.engine.CardFilterFactory;
-import io.skydeck.gserver.engine.QueryManager;
-import io.skydeck.gserver.engine.SettlementEngine;
-import io.skydeck.gserver.util.PositionUtil;
+import io.skydeck.gserver.engine.GameEngine;
 
-import java.util.Collections;
-import java.util.List;
+public class DyingSettlement extends SettlementBase {
+    private Player deceased;
+    private Player killer;
 
-public class DyingSettlement implements SettlementBase {
-    private Player player;
-    private Player dealer;
-
-    public static DyingSettlement newOne(Player player, Player dealer) {
+    public static DyingSettlement newOne(Player deceased, Player killer) {
         DyingSettlement settlement = new DyingSettlement();
-        settlement.player = player;
-        settlement.dealer = dealer;
+        settlement.deceased = deceased;
+        settlement.killer = killer;
         return settlement;
     }
 
     @Override
-    public void resolve(SettlementEngine engine) {
-        QueryManager queryManager = engine.getQueryManager();
-        CardFilterFactory cardFilterFactory = engine.getCardFilterFactory();
+    public void resolve(GameEngine engine) {
+        //TODO punishment and reward
+        deceased.setDead(true);
         engine.onDying(this);
-        List<Player> sortedPlayers = PositionUtil.positionSort(engine.getCurrentPlayer(), engine.getPlayers())
-                .stream()
-                .filter(person -> !person.isDead() && !person.isInLimbo())
-                .toList();
-        for (Player person : sortedPlayers) {
-            queryManager.cardUseQuery(person, cardFilterFactory.cureFilter(), Collections.emptyList());
-        }
-        engine.onRecover(this);
 
+        deceased.clearExtraResource(engine);
     }
 }

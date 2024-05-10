@@ -12,5 +12,6 @@ public enum CardSubType {
     Armor,
     OffenseRide,
     DefenseRide,
+    SpecialRide,
     Treasure
 }

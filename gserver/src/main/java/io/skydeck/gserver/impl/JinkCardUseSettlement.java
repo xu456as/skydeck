@@ -1,9 +1,8 @@
 package io.skydeck.gserver.impl;
 
-import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.CardSettlement;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
-import io.skydeck.gserver.engine.SettlementEngine;
+import io.skydeck.gserver.engine.GameEngine;
 
 public class JinkCardUseSettlement extends CardSettlement {
     private CardUseDTO jinkUseDTO;
@@ -17,7 +16,7 @@ public class JinkCardUseSettlement extends CardSettlement {
     }
 
     @Override
-    public void resolve(SettlementEngine engine) {
+    public void resolve(GameEngine engine) {
 
     }
 }

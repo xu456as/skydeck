@@ -1,61 +1,166 @@
 package io.skydeck.gserver.domain;
 
+import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
+import io.skydeck.gserver.engine.GameEngine;
+import io.skydeck.gserver.impl.DamageSettlement;
+import io.skydeck.gserver.impl.SlashCardUseSettlement;
+
+import java.util.Collections;
+import java.util.Set;
+
 public abstract class AbilityBase {
 
-    public void onCardUsing() {}
-    public void onCardTargeting() {}
-    public void onCardTargeted() {}
-    public void onCardEffecting() {}
-    public void onCardEffected() {}
-    public void onCardUsed() {}
+    public Set<Enum> events() {
+        return Collections.emptySet();
+    }
+    public boolean canActive(GameEngine engine, Enum event, Player player) {return false;}
 
-    public void onCardSacrificing() {}
-    public void onCardSacrificed() {}
+    public String queryName() {
+        return null;
+    }
 
-    public void onCardDiscarded() {}
+    public void onCardUsing() {
+    }
 
-    public void onCardLosing() {}
-    public void onCardLost() {}
+    public void onCardTargeting() {
+    }
 
-    public void onDealingDamage() {}
-    public void onDealtDamage() {}
-    public void onGettingDamage() {}
-    public void onGotDamage() {}
+    public void onCardTargeted() {
+    }
 
-    public void onDrawNumberCheck() {}
-    public void onAlcoholLimitCheck() {}
-    public void onSlashLimitCheck() {}
-    public void onSlashNumberCheck() {}
-    public void onHandUpperBoundCheck() {}
+    public void onCardEffecting() {
+    }
 
-    public void onCardDisposeAllowCheck() {}
-    public void onSkillActiveAllowCheck() {}
+    public void onCardEffected() {
+    }
 
-    public void onDistanceCheck() {}
-    public void onEffectMuteCheck() {}
+    public void onCardUsed() {
+    }
 
-    public void onCardUsingQuery() {}
-    public void onCardSacrificingQuery() {}
+    public void onCardSacrificing() {
+    }
 
-    public void onEnteringCureQuery() {}
-    public void onLeavingCureQuery() {}
+    public void onCardSacrificed() {
+    }
 
-    public void onDying() {}
+    public void onCardDiscarded() {
+    }
 
-    public void onStart() {}
-    public void onPreparePhase() {}
-    public void onPreEnterJudgePhase() {}
-    public void onPreEnterDrawPhase() {}
-    public void onEnteringDrawPhase() {}
-    public void onDrawPhase() {}
-    public void onLeavingDrawPhase() {}
-    public void onPreEnterActivePhase() {}
-    public void onEnteringActivePhase() {}
-    public void onLeavingActivePhase() {}
-    public void onPreEnterDiscardPhase() {}
-    public void onEnteringDiscardPhase() {}
-    public void onDiscardPhase() {}
-    public void onLeavingDiscardPhase() {}
-    public void onEndPhase() {}
-    public void onYield() {}
+    public void onCardLosing() {
+    }
+
+    public void onCardLost() {
+    }
+
+    public void onODamaging(GameEngine engine, DamageSettlement settlement) {
+    }
+    public void onDDamaging(GameEngine engine, DamageSettlement settlement) {
+    }
+    public void onODamage(GameEngine engine, DamageSettlement settlement) {
+    }
+
+
+    public void onDDamaged(GameEngine engine, DamageSettlement settlement) {
+    }
+
+    public void onDrawNumberCheck() {
+    }
+
+    public void onAlcoholLimitCheck() {
+    }
+
+    public void onSlashLimitCheck() {
+    }
+
+    public void onSlashNumberCheck() {
+    }
+
+    public void onHandUpperBoundCheck() {
+    }
+
+    public void onCardDisposeAllowCheck() {
+    }
+
+    public void onSkillActiveAllowCheck() {
+    }
+
+    public void onDistanceCheck() {
+    }
+
+    public void onEffectMuteCheck() {
+    }
+
+    public void onCardUsingQuery() {
+    }
+
+    public void onCardSacrificingQuery() {
+    }
+
+    public void onEnteringCureQuery() {
+    }
+
+    public void onLeavingCureQuery() {
+    }
+
+    public void onDying() {
+    }
+
+    public void onStart() {
+    }
+
+    public void onPreparePhase() {
+    }
+
+    public void onPreEnterJudgePhase() {
+    }
+
+    public void onPreEnterDrawPhase() {
+    }
+
+    public void onEnteringDrawPhase() {
+    }
+
+    public void onDrawPhase() {
+    }
+
+    public void onLeavingDrawPhase() {
+    }
+
+    public void onPreEnterActivePhase() {
+    }
+
+    public void onEnteringActivePhase() {
+    }
+
+    public void onLeavingActivePhase() {
+    }
+
+    public void onPreEnterDiscardPhase() {
+    }
+
+    public void onEnteringDiscardPhase() {
+    }
+
+    public void onDiscardPhase() {
+    }
+
+    public void onLeavingDiscardPhase() {
+    }
+
+    public void onEndPhase() {
+    }
+
+    public void onYield() {
+    }
+
+    public void onJinkSucceed(GameEngine engine, SlashCardUseSettlement settlement, Player offender, Player defender) {
+
+    }
+    public void proactiveAction(GameEngine engine, Player player, ProactiveActionDTO proactiveActionDTO) {
+
+    }
+
+    public boolean canSelectAsCardTarget(Player player, Player target, CardBase card) {
+        return false;
+    }
 }

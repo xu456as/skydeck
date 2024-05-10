@@ -3,9 +3,12 @@ package io.skydeck.gserver.enums;
 public enum CardUseEvent {
     PreTarget,
     Using,
-    Tarting,
-    Targeted,
+    OTarting,
+    DTargeting,
+    OTargeted,
+    DTargeted,
     Effecting,
     Effected,
+    EffectDone,
     Used
 }

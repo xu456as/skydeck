@@ -4,8 +4,10 @@ import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.Player;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class CardDiscardDTO {
     private Player player;
-    private CardBase card;
+    private List<CardBase> card;
 }

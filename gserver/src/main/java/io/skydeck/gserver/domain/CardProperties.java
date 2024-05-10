@@ -4,6 +4,7 @@ import io.skydeck.gserver.enums.*;
 
 public interface CardProperties {
     public abstract String name();
+    public abstract CardNameType nameType();
     public abstract Integer number();
     public abstract Color color();
     public abstract Suit suit();
