@@ -5,10 +5,12 @@ import io.skydeck.gserver.domain.DynamicCard;
 import io.skydeck.gserver.domain.GearCardBase;
 import io.skydeck.gserver.enums.*;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
+@Component
 public class DynamicCardManager {
     public DynamicCard convert(List<CardBase> cards, CardNameType cardNameType) {
         return new DynamicCard() {

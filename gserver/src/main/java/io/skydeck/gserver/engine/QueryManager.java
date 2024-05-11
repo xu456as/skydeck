@@ -6,9 +6,11 @@ import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class QueryManager {
     //TODO
     public CardUseDTO cardUseQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
@@ -20,6 +22,9 @@ public class QueryManager {
         return null;
     }
     public int abilityOptionQuery(Player player, AbilityBase ability, String... options) {
+        //TODO
+        return -1;
+    }
 
     public int abilityOptionQuery(Player player, AbilityBase ability, List<String> options) {
         //TODO

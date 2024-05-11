@@ -20,12 +20,18 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.*;
 
 public class WuShengSkill extends SkillBase {
+    private Player owner;
+    public WuShengSkill(Player owner) {
+        this.owner = owner;
+    }
     @Override
     public boolean canActive(GameEngine engine, Enum event, Player player) {
-        List<CardBase> cards = new ArrayList<>();
-        cards.addAll(player.getHands());
-        cards.addAll(player.getEquips());
-        return cards.stream().anyMatch(card -> card.color() == Color.Red);
+        return false;
+        //TODO to be removed?
+//        List<CardBase> cards = new ArrayList<>();
+//        cards.addAll(owner.getHands());
+//        cards.addAll(owner.getEquips());
+//        return cards.stream().anyMatch(card -> card.color() == Color.Red);
     }
 
     @Override

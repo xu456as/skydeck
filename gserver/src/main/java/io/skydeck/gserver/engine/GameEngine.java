@@ -11,23 +11,34 @@ import io.skydeck.gserver.impl.DyingSettlement;
 import io.skydeck.gserver.impl.InDangerSettlement;
 import io.skydeck.gserver.impl.SlashCardUseSettlement;
 import io.skydeck.gserver.util.PositionUtil;
+import jakarta.annotation.Resource;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 @Data
 @Log4j2
+@Component
 public class GameEngine {
-
+    @Resource
     private CardFilterFactory cardFilterFactory;
+    @Resource
     private PublicCardResManager pcrManager;
+    @Resource
     private QueryManager queryManager;
+    @Resource
     private DynamicCardManager dynamicCardManager;
     private Player currentPlayer;
     private List<Player> players;
+    private volatile boolean activeEnd = false;
     private Phase currentPhase;
     private SettlementBase currentSettlement;
+    private List<CardBase> csBuffer = new ArrayList<>();
 //    private Queue<SettlementBase> settlementQueue;
 
     public int distance(Player offender, Player defender) {
@@ -89,6 +100,7 @@ public class GameEngine {
     }
 
     private void resolveStage() {
+        activeEnd = false;
         this.onStart();
         this.onPreparePhase();
         this.onPreEnterJudgePhase();
@@ -270,7 +282,16 @@ public class GameEngine {
     }
 
     public void onActivePhase() {
+        System.out.println("active");
+        while (!activeEnd) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                log.error("activePhase sleep error", e);
+            }
+        }
     }
+
 
     public void onLeavingActivePhase() {
     }
@@ -311,4 +332,7 @@ public class GameEngine {
     /* Events End*/
 
 
+    public void endActivePhase() {
+        activeEnd = true;
+    }
 }

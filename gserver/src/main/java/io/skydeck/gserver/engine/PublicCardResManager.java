@@ -3,11 +3,14 @@ package io.skydeck.gserver.engine;
 import io.skydeck.gserver.domain.CardBase;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.rng.core.source32.JDKRandom;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Component
 public class PublicCardResManager {
 
+//    head in ground list
     private LinkedList<CardBase> deck;
     private Set<CardBase> grave;
 

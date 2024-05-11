@@ -1,5 +1,6 @@
 package io.skydeck.gserver.domain;
 
+import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.DuckEvent;
@@ -115,5 +116,10 @@ public class Player implements Comparable<Player> {
     public void onDDamaged(GameEngine engine, DamageSettlement settlement) {
 //        getSkills().forEach(skill -> skill.onDDamaged(settlement));
         //TODO
+    }
+
+    public void acquireHand(CardTransferContext ctc, List<CardBase> cards) {
+        //TODO add alarm
+        hands.addAll(cards);
     }
 }

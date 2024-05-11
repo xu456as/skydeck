@@ -3,9 +3,11 @@ package io.skydeck.gserver.engine;
 import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.CardFilterIface;
 import io.skydeck.gserver.enums.CardSubType;
+import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
+@Component
 public class CardFilterFactory {
     public CardFilterIface newFilter(Function<CardBase, Boolean> func) {
         return func::apply;
