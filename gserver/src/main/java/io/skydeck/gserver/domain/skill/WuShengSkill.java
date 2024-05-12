@@ -1,5 +1,6 @@
 package io.skydeck.gserver.domain.skill;
 
+import io.skydeck.gserver.annotation.AbilityName;
 import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.DynamicCard;
 import io.skydeck.gserver.domain.Player;
@@ -19,23 +20,15 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
 
+@AbilityName("WuSheng")
 public class WuShengSkill extends SkillBase {
     private Player owner;
     public WuShengSkill(Player owner) {
         this.owner = owner;
     }
-    @Override
-    public boolean canActive(GameEngine engine, Enum event, Player player) {
-        return false;
-        //TODO to be removed?
-//        List<CardBase> cards = new ArrayList<>();
-//        cards.addAll(owner.getHands());
-//        cards.addAll(owner.getEquips());
-//        return cards.stream().anyMatch(card -> card.color() == Color.Red);
-    }
 
     @Override
-    public String queryName() {
+    public String name() {
         return "WuSheng";
     }
 

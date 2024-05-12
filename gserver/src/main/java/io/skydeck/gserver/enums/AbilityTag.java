@@ -1,13 +1,13 @@
 package io.skydeck.gserver.enums;
 
-public enum SkillType {
+public enum AbilityTag {
     None,
     Perm,
-    Limited,
+    OneOff,
     LordOwned,
     PrimaryOwned,
     ViceOwned,
     PositionEmpower,
-    Transform,
+    Switchable,
     ;
 }

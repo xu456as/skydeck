@@ -96,7 +96,7 @@ public class GuanShiFuCard extends GearCardBase {
         }
 
         @Override
-        public String queryName() {
+        public String name() {
             return "GuanShiFu";
         }
         @Override

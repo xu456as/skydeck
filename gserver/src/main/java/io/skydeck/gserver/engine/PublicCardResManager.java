@@ -14,7 +14,7 @@ public class PublicCardResManager {
     private LinkedList<CardBase> deck;
     private Set<CardBase> grave;
 
-    public void addToGrave(List<CardBase> cards) {
+    public void addToGrave(GameEngine e, List<CardBase> cards) {
         grave.addAll(cards);
     }
     public void removeFromGrave(List<CardBase> cards) {

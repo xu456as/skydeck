@@ -2,6 +2,7 @@ package io.skydeck.gserver.domain;
 
 import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
 import io.skydeck.gserver.engine.GameEngine;
+import io.skydeck.gserver.enums.AbilityTag;
 import io.skydeck.gserver.impl.DamageSettlement;
 import io.skydeck.gserver.impl.SlashCardUseSettlement;
 
@@ -10,13 +11,15 @@ import java.util.Set;
 
 public abstract class AbilityBase {
 
+    public Set<AbilityTag> tags() {return Collections.emptySet();}
+
     public Set<Enum> events() {
         return Collections.emptySet();
     }
     public boolean canActive(GameEngine engine, Enum event, Player player) {return false;}
 
-    public String queryName() {
-        return null;
+    public String name() {
+        return "";
     }
 
     public void onCardUsing() {
@@ -49,7 +52,7 @@ public abstract class AbilityBase {
     public void onCardLosing() {
     }
 
-    public void onCardLost() {
+    public void onCardLost(GameEngine e, Enum type, Player player) {
     }
 
     public void onODamaging(GameEngine engine, DamageSettlement settlement) {
@@ -163,4 +166,16 @@ public abstract class AbilityBase {
     public boolean canSelectAsCardTarget(Player player, Player target, CardBase card) {
         return false;
     }
+
+
+    //begin extra attributes
+    public int offensePoint() {
+        return 0;
+    }
+    public int defensePoint() {
+        return 0;
+    }
+
+
+    //end extra attributes
 }

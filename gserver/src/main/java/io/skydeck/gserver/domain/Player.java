@@ -2,18 +2,17 @@ package io.skydeck.gserver.domain;
 
 import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.engine.GameEngine;
-import io.skydeck.gserver.engine.QueryManager;
-import io.skydeck.gserver.enums.DuckEvent;
-import io.skydeck.gserver.enums.Gender;
-import io.skydeck.gserver.enums.Kingdom;
+import io.skydeck.gserver.enums.*;
 import io.skydeck.gserver.impl.DamageSettlement;
 import io.skydeck.gserver.impl.SlashCardUseSettlement;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Data
@@ -25,20 +24,21 @@ public class Player implements Comparable<Player> {
     private boolean dead = false;
     private Gender gender = Gender.None;
     private Kingdom kingdom = Kingdom.Unknown;
-    private HeroBase primaryHero;
-    private HeroBase viceHero;
-    private List<GearCardBase> equips;
-    private List<CardBase> judges;
-    private List<CardBase> hands;
-    private List<TokenBase> tokens;
-    private List<SkillBase> skills;
-    private List<AbilityBase> abilities;
+    private RuntimeHeroBase primaryHero;
+    private RuntimeHeroBase viceHero;
+    private int heroMask = 0;
+    private List<GearCardBase> equips = new ArrayList<>();
+    private List<CardBase> judges = new ArrayList<>();
+    private List<CardBase> hands = new ArrayList<>();
+    private List<TokenBase> tokens = new ArrayList<>();
+    private List<SkillBase> skills = new ArrayList<>();
+    private List<AbilityBase> abilities = new ArrayList<>();
     private boolean expelled = false;
     private boolean chained = false;
     private StageState stageState;
 
     public void clearExtraResource(GameEngine engine) {
-        //TODO
+        //TODO clear tokens
     }
 
     @Override
@@ -71,36 +71,45 @@ public class Player implements Comparable<Player> {
     }
 
     public int attackRange() {
-        //TODO
-        return 1;
+        if (CollectionUtils.isEmpty(equips)) {
+            return 1;
+        }
+        return equips.stream()
+                .filter(card -> card.subType() == CardSubType.Weapon)
+                .map(GearCardBase::attackRange)
+                .max(Integer::compareTo)
+                .orElse(1);
     }
     public int offensePoint() {
-        //TODO
-        return 0;
+        return horseSum(GearCardBase::offensePoint, AbilityBase::offensePoint);
     }
     public int defensePoint() {
-        //TODO
-        return 0;
+        return horseSum(GearCardBase::defensePoint, AbilityBase::defensePoint);
+    }
+    private int horseSum(Function<GearCardBase, Integer> cardFunc, Function<AbilityBase, Integer> abilityFunc) {
+        int sum = 0;
+        sum += equips.stream()
+                .map(cardFunc)
+                .reduce(Integer::sum)
+                .orElse(0);
+        sum += allAbilities().stream()
+                .map(abilityFunc)
+                .reduce(Integer::sum)
+                .orElse(0);
+        return sum;
     }
 
     public void onJinkSucceed(GameEngine engine, SlashCardUseSettlement settlement, Player offender, Player defender) {
-        List<AbilityBase> abilityBaseList = abilityList().stream()
-                .filter(abilityBase -> abilityBase.events().contains(DuckEvent.JinkUseDuck))
+        List<AbilityBase> abilities = allAbilities().stream()
                 .filter(abilityBase -> abilityBase.canActive(engine, DuckEvent.JinkUseDuck, this))
                 .collect(Collectors.toList());
-        QueryManager queryManager = engine.getQueryManager();
-        while (!abilityBaseList.isEmpty()) {
-            AbilityBase abilityBase = queryManager.abilitiesQuery(this, abilityBaseList);
-            if (abilityBase == null) {
-                break;
-            }
-            abilityBaseList.remove(abilityBase);
-            abilityBase.onJinkSucceed(engine, settlement, offender, defender);
-        }
+        engine.batchQueryAbility(this, abilities,
+                (ability) -> ability.onJinkSucceed(engine, settlement, offender, defender)
+        );
     }
 
 
-    private List<AbilityBase> abilityList() {
+    private List<AbilityBase> allAbilities() {
         List<AbilityBase> abilityList = new ArrayList<>();
         abilityList.addAll(skills);
         abilityList.addAll(abilities);
@@ -114,12 +123,28 @@ public class Player implements Comparable<Player> {
     }
 
     public void onDDamaged(GameEngine engine, DamageSettlement settlement) {
-//        getSkills().forEach(skill -> skill.onDDamaged(settlement));
-        //TODO
+        List<AbilityBase> abilities = allAbilities().stream()
+                .filter(ab -> ab.canActive(engine, DamageEvent.DDamaged, this))
+                .toList();
+        engine.batchQueryAbility(this, abilities, (ability) -> ability.onDDamaged(engine, settlement));
     }
 
-    public void acquireHand(CardTransferContext ctc, List<CardBase> cards) {
+    public void acquireHand(GameEngine e, CardTransferContext ctc, List<CardBase> cards) {
         //TODO add alarm
         hands.addAll(cards);
+    }
+    public void removeHand(GameEngine e, List<CardBase> cards) {
+        hands.remove(cards);
+    }
+    public void removeEquip(GameEngine e, List<CardBase> cards) {
+        equips.remove(cards);
+    }
+
+
+    public void onCardLost(GameEngine e, Player player, Enum type) {
+        List<AbilityBase> abList = allAbilities().stream()
+                .filter(ab -> ab.canActive(e, type, player))
+                .toList();
+        e.batchQueryAbility(this, abList, (ab) -> ab.onCardLost(e, type, player));
     }
 }

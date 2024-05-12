@@ -5,13 +5,13 @@ import io.skydeck.gserver.enums.Kingdom;
 
 import java.util.List;
 
-public abstract class HeroBase {
-    public abstract Integer id();
-    public abstract List<SkillBase> skills();
+public abstract class StaticHeroBase {
+    public abstract String id();
+    public abstract List<String> skills();
     public abstract String name();
     public abstract String title();
-    public abstract int maxHealth();
-    public abstract int initHealth();
+    public abstract String maxHealth();
+    public String initHealth() {return maxHealth();}
     public abstract Kingdom kingdom();
     public abstract List<String> buddies();
     public abstract Gender gender();

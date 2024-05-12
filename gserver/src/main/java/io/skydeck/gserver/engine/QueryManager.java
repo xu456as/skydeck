@@ -6,6 +6,7 @@ import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
+import io.skydeck.gserver.i18n.TextDictionary;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,12 +22,12 @@ public class QueryManager {
         //TODO
         return null;
     }
-    public int abilityOptionQuery(Player player, AbilityBase ability, String... options) {
+    public int abilityOptionQuery(Player player, AbilityBase ability, TextDictionary... options) {
         //TODO
         return -1;
     }
 
-    public int abilityOptionQuery(Player player, AbilityBase ability, List<String> options) {
+    public int abilityOptionQuery(Player player, AbilityBase ability, List<TextDictionary> options) {
         //TODO
         return -1;
     }

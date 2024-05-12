@@ -1,9 +1,6 @@
 package io.skydeck.gserver.engine;
 
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.CardSettlement;
-import io.skydeck.gserver.domain.Player;
-import io.skydeck.gserver.domain.SettlementBase;
+import io.skydeck.gserver.domain.*;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.enums.*;
 import io.skydeck.gserver.impl.DamageSettlement;
@@ -20,11 +17,14 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @Data
 @Log4j2
 @Component
 public class GameEngine {
+    @Resource
+    private AbilityFactory abilityFactory;
     @Resource
     private CardFilterFactory cardFilterFactory;
     @Resource
@@ -150,7 +150,13 @@ public class GameEngine {
     public void runSettlement(SettlementBase settlement) {
         settlement.resolve(this);
     }
-
+    public void addToCsBuffer(List<CardBase> cards) {
+        csBuffer.addAll(cards);
+    }
+    public void purgeCsBuffer() {
+        pcrManager.addToGrave(this, csBuffer);
+        csBuffer.clear();
+    }
 
     /* Events Begin*/
     public void onCardUsing(CardUseDTO dto, CardSettlement settlement) {
@@ -181,13 +187,13 @@ public class GameEngine {
     public void onCardSacrificed() {
     }
 
-    public void onCardDiscarded() {
+    public void onCardDiscarded(Player player, List<CardBase> cards) {
     }
 
     public void onCardLosing() {
     }
 
-    public void onCardLost() {
+    public void onCardLost(Player player, Enum type, List<CardBase> cards) {
     }
 
     public boolean onDealingDamage(DamageSettlement settlement) {
@@ -314,10 +320,11 @@ public class GameEngine {
     public void onYield() {
     }
 
-    public void onCardBurying(CardUseDTO dto, CardSettlement settlement) {
+    public void onCardBurying(Player player, Enum type, List<CardBase> cards) {
     }
 
-    public void onCardBuried(CardUseDTO dto, CardSettlement settlement) {
+    public void onCardBuried(Player player, Enum type, List<CardBase> cards) {
+
     }
 
 
@@ -334,5 +341,17 @@ public class GameEngine {
 
     public void endActivePhase() {
         activeEnd = true;
+    }
+
+    public void batchQueryAbility(Player player, List<AbilityBase> abilities, Consumer<AbilityBase> action) {
+        List<AbilityBase> abilityCol = new ArrayList<>(abilities);
+        while (!abilityCol.isEmpty()) {
+            AbilityBase ability = queryManager.abilitiesQuery(player, abilityCol);
+            if (ability == null) {
+                break;
+            }
+            abilityCol.remove(ability);
+            action.accept(ability);
+        }
     }
 }

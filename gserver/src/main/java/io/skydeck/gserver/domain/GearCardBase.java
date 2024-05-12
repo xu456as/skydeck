@@ -5,7 +5,7 @@ import io.skydeck.gserver.engine.GameEngine;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class GearCardBase extends CardBase {
+public abstract class GearCardBase extends CardBase{
     public int offensePoint() {
         return 0;
     }
@@ -22,4 +22,5 @@ public abstract class GearCardBase extends CardBase {
     public void onEnteringGearArea(GameEngine engine, Player player) {}
     public void onLeavingGearArea(GameEngine engine, Player player) {}
     public void onBurying(GameEngine engine, Player player) {}
+
 }
