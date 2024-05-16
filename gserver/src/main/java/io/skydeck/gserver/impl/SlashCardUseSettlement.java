@@ -4,10 +4,10 @@ import io.skydeck.gserver.domain.CardSettlement;
 import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.engine.CardFilterFactory;
-import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.engine.GameEngine;
+import io.skydeck.gserver.engine.QueryManager;
+import io.skydeck.gserver.enums.CardLostType;
 import io.skydeck.gserver.util.PositionUtil;
-import lombok.Data;
 import lombok.Setter;
 import org.apache.commons.collections4.MapUtils;
 
@@ -33,6 +33,12 @@ public class SlashCardUseSettlement extends CardSettlement {
     public void resolve(GameEngine engine) {
         QueryManager queryManager = engine.getQueryManager();
         CardFilterFactory cff = engine.getCardFilterFactory();
+
+        Player user = cardUseDTO.getPlayer();
+        user.removeCard(engine, Collections.singletonList(cardUseDTO.getCard()), CardLostType.Use);
+        user.getStageState().setUseCardCount(user.getStageState().getUseCardCount() + 1);
+        user.getStageState().setUseSlashCount(user.getStageState().getUseSlashCount() + 1);
+        engine.onCardLost(user, CardLostType.Use, Collections.singletonList(cardUseDTO.getCard()));
         engine.onCardUsing(cardUseDTO, this);
         engine.onCardTargeting(cardUseDTO, this);
         engine.onCardTargeted(cardUseDTO, this);
@@ -72,8 +78,6 @@ public class SlashCardUseSettlement extends CardSettlement {
         }
         cardUseDTO.getPlayer().getStageState().setDrunk(false);
         engine.onCardEffectFinish(cardUseDTO, this);
-        engine.onCardUsed(cardUseDTO, this);
-        engine.onCardBurying(cardUseDTO, this);
         engine.onCardUsed(cardUseDTO, this);
     }
 

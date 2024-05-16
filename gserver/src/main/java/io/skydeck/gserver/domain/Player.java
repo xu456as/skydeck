@@ -8,10 +8,7 @@ import io.skydeck.gserver.impl.SlashCardUseSettlement;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,6 +18,7 @@ public class Player implements Comparable<Player> {
     private String name;
     private int health;
     private int maxHealth;
+    private boolean inDanger = false;
     private boolean dead = false;
     private Gender gender = Gender.None;
     private Kingdom kingdom = Kingdom.Unknown;
@@ -37,8 +35,12 @@ public class Player implements Comparable<Player> {
     private boolean chained = false;
     private StageState stageState;
 
-    public void clearExtraResource(GameEngine engine) {
-        //TODO clear tokens
+    public void clearResource(GameEngine engine) {
+        //TODO clear tokens when dead
+    }
+
+    public Kingdom revealFinalKingdom(GameEngine e) {
+        return kingdom;
     }
 
     @Override
@@ -133,11 +135,50 @@ public class Player implements Comparable<Player> {
         //TODO add alarm
         hands.addAll(cards);
     }
-    public void removeHand(GameEngine e, List<CardBase> cards) {
-        hands.remove(cards);
+
+    public void updateHealth(GameEngine e, int amount) {
+        if (stageState.getHealthLocked()) {
+            return;
+        }
+        int delta = 0;
+        if (this.health + amount >= this.maxHealth) {
+            delta = maxHealth - health;
+            this.health = maxHealth;
+        } else {
+            delta = amount;
+            this.health += amount;
+        }
+        if (delta != 0) {
+            e.onHealthChanged(this, delta);
+        }
     }
-    public void removeEquip(GameEngine e, List<CardBase> cards) {
-        equips.remove(cards);
+    public void removeCard(GameEngine e, List<CardBase> cards, CardLostType type) {
+        List<CardBase> handToRemove = new ArrayList<>();
+        List<CardBase> equipToRemove = new ArrayList<>();
+        Set<CardBase> cardSet = new HashSet<>();
+        for (CardBase card : cards) {
+            if (card instanceof DynamicCard dynamicCard) {
+                if (dynamicCard.virtual()) {
+                    continue;
+                }
+                cardSet.addAll(dynamicCard.originCards());
+            } else {
+                cardSet.add(card);
+            }
+        }
+        for (CardBase card : hands) {
+            if (cardSet.contains(card)) {
+                handToRemove.add(card);
+            }
+        }
+        for (CardBase card : equips) {
+            if (cardSet.contains(card)) {
+                equipToRemove.add(card);
+            }
+        }
+        hands.removeAll(handToRemove);
+        equips.removeAll(equipToRemove);
+        e.addToCsBuffer(this, cards, type);
     }
 
 

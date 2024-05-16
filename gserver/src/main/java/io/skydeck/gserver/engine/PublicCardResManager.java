@@ -1,6 +1,7 @@
 package io.skydeck.gserver.engine;
 
 import io.skydeck.gserver.domain.CardBase;
+import io.skydeck.gserver.domain.DynamicCard;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.rng.core.source32.JDKRandom;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,18 @@ public class PublicCardResManager {
     private Set<CardBase> grave;
 
     public void addToGrave(GameEngine e, List<CardBase> cards) {
-        grave.addAll(cards);
+        List<CardBase> realCards = new ArrayList<>();
+        for (CardBase card : cards) {
+            if (card instanceof DynamicCard dCard) {
+                if (dCard.virtual()) {
+                    continue;
+                }
+                realCards.addAll(dCard.originCards());
+            } else {
+                realCards.add(card);
+            }
+        }
+        grave.addAll(realCards);
     }
     public void removeFromGrave(List<CardBase> cards) {
         grave.removeAll(cards);

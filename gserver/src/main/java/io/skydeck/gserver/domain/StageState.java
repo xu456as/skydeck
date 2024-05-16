@@ -9,6 +9,8 @@ import java.util.List;
 @Data
 public class StageState {
     @DValue("false")
+    private Boolean healthLocked;
+    @DValue("false")
     private Boolean inLimbo;
     @DValue("1")
     private Integer slashQuota;

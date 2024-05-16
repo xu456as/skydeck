@@ -25,6 +25,10 @@ public class InDangerSettlement extends SettlementBase {
 
     @Override
     public void resolve(GameEngine engine) {
+        if (player.isInDanger()) {
+            return;
+        }
+        player.setInDanger(true);
         QueryManager queryManager = engine.getQueryManager();
         CardFilterFactory cff = engine.getCardFilterFactory();
         engine.onDanger(this);
@@ -44,7 +48,7 @@ public class InDangerSettlement extends SettlementBase {
                     CureCardUseSettlement settlement = CureCardUseSettlement.newOne(cardUseDTO);
                     settlement.resolve(engine);
                 } else if (cardUseDTO.getCard().subType() == CardSubType.Liquor) {
-                    LiquorCardUseSettlement settlement = LiquorCardUseSettlement.newOne(cardUseDTO, true);
+                    LiquorCardUseSettlement settlement = LiquorCardUseSettlement.newOne(cardUseDTO);
                     settlement.resolve(engine);
                 }
             }
@@ -53,6 +57,7 @@ public class InDangerSettlement extends SettlementBase {
             }
         }
         if (player.getHealth() >= 1) {
+            player.setInDanger(false);
             engine.onRecover(this);
         } else {
             DyingSettlement dyingSettlement = DyingSettlement.newOne(player, dealer);

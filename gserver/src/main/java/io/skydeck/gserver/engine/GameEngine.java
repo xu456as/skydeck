@@ -1,23 +1,22 @@
 package io.skydeck.gserver.engine;
 
 import io.skydeck.gserver.domain.*;
+import io.skydeck.gserver.domain.dto.CardDiscardDTO;
+import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.enums.*;
-import io.skydeck.gserver.impl.DamageSettlement;
-import io.skydeck.gserver.impl.DyingSettlement;
-import io.skydeck.gserver.impl.InDangerSettlement;
-import io.skydeck.gserver.impl.SlashCardUseSettlement;
+import io.skydeck.gserver.impl.*;
 import io.skydeck.gserver.util.PositionUtil;
 import jakarta.annotation.Resource;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Data
 @Log4j2
@@ -38,9 +37,32 @@ public class GameEngine {
     private volatile boolean activeEnd = false;
     private Phase currentPhase;
     private SettlementBase currentSettlement;
-    private List<CardBase> csBuffer = new ArrayList<>();
+    private Queue<CsBufferItem> csBuffer = new LinkedList<>();
+
 //    private Queue<SettlementBase> settlementQueue;
 
+    public int aliveTeamMember(Player player) {
+        if (player.isDead()) {
+            return 0;
+        }
+        Kingdom kingdom = player.getKingdom();
+        if (kingdom == Kingdom.Unknown) {
+            return 1;
+        } else if (kingdom == Kingdom.Am) {
+            return 1;
+        } else {
+            int count = 0;
+            for (Player p : players) {
+                if (p.isDead()) {
+                    continue;
+                }
+                if(p.getKingdom() == kingdom) {
+                    ++count;
+                }
+            }
+            return count;
+        }
+    }
     public int distance(Player offender, Player defender) {
         return PositionUtil.distance(offender, defender, players);
     }
@@ -55,10 +77,22 @@ public class GameEngine {
             case FireSlash:
             case IceSlash:
             case ThunderSlash:
+                if (offender == currentPlayer && currentPhase == Phase.ActivePhase) {
+                    StageState stageState = offender.getStageState();
+                    if (stageState.getUseSlashCount() >= stageState.getSlashQuota()) {
+                        return false;
+                    }
+                }
                 return offender.attackRange() >= distance(offender, defender);
             case Cure:
                 return offender == defender || defender.getHealth() <= 0;
             case Liquor:
+                if (offender == currentPlayer) {
+                    StageState stageState = offender.getStageState();
+                    if (stageState.getUseLiquorCount() >= stageState.getLiquorQuota()) {
+                        return false;
+                    }
+                }
                 return offender == defender;
             case DuelPloy:
             case DismantlePloy:
@@ -149,13 +183,47 @@ public class GameEngine {
 
     public void runSettlement(SettlementBase settlement) {
         settlement.resolve(this);
+        purgeCsBuffer();
     }
-    public void addToCsBuffer(List<CardBase> cards) {
-        csBuffer.addAll(cards);
+    public void addToCsBuffer(Player player, List<CardBase> cards, CardLostType type) {
+        if (CollectionUtils.isEmpty(cards)) {
+            return;
+        }
+        csBuffer.offer(CsBufferItem.newOne(player, cards, type));
     }
-    public void purgeCsBuffer() {
-        pcrManager.addToGrave(this, csBuffer);
-        csBuffer.clear();
+
+    public boolean checkCsBuffer(CardBase card) {
+        return csBuffer.stream().anyMatch(item -> item.cards.contains(card));
+    }
+    public List<CardBase> recycleCsBuffer(CardBase card) {
+        return csBuffer.stream()
+                .filter(item -> item.cards.contains(card))
+                .map(item -> {
+                    item.cards.remove(card);
+                    List<CardBase> cardList = null;
+                    if (card instanceof DynamicCard dCard) {
+                        if (dCard.virtual()) {
+                            cardList = Collections.emptyList();
+                        } else {
+                            cardList = new ArrayList<>(dCard.originCards());
+                        }
+                    } else {
+                        cardList = new ArrayList<>();
+                        cardList.add(card);
+                    }
+                    return cardList;
+                })
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
+    private void purgeCsBuffer() {
+        while (!csBuffer.isEmpty()) {
+            CsBufferItem item = csBuffer.poll();
+            onCardBurying(item.owner, item.cards, item.lostType);
+            pcrManager.addToGrave(this, item.cards);
+            onCardBuried(item.owner, item.cards, item.lostType);
+        }
+
     }
 
     /* Events Begin*/
@@ -181,13 +249,13 @@ public class GameEngine {
     public void onCardUsed(CardUseDTO dto, CardSettlement settlement) {
     }
 
-    public void onCardSacrificing() {
+    public void onCardSacrificing(CardSacrificeDTO dto, CardSacrificeSettlement settlement) {
     }
 
-    public void onCardSacrificed() {
+    public void onCardSacrificed(CardSacrificeDTO dto, CardSacrificeSettlement settlement) {
     }
 
-    public void onCardDiscarded(Player player, List<CardBase> cards) {
+    public void onCardDiscarded(CardDiscardDTO dto, CardDiscardSettlement settlement) {
     }
 
     public void onCardLosing() {
@@ -320,10 +388,10 @@ public class GameEngine {
     public void onYield() {
     }
 
-    public void onCardBurying(Player player, Enum type, List<CardBase> cards) {
+    public void onCardBurying(Player player, List<CardBase> cards, Enum type) {
     }
 
-    public void onCardBuried(Player player, Enum type, List<CardBase> cards) {
+    public void onCardBuried(Player player, List<CardBase> cards, Enum type) {
 
     }
 
@@ -352,6 +420,24 @@ public class GameEngine {
             }
             abilityCol.remove(ability);
             action.accept(ability);
+        }
+    }
+
+
+    public void onHealthChanged(Player player, int amount) {
+    }
+
+
+    private static class CsBufferItem {
+        private Player owner;
+        private List<CardBase> cards;
+        private CardLostType lostType;
+        static CsBufferItem newOne(Player owner, List<CardBase> cards, CardLostType type) {
+            CsBufferItem item = new CsBufferItem();
+            item.owner = owner;
+            item.lostType = type;
+            item.cards = cards;
+            return item;
         }
     }
 }

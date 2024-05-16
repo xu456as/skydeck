@@ -1,8 +1,10 @@
 package io.skydeck.gserver.enums;
 
-public enum CardLostEvent {
+public enum CardLostType {
     Discard,
     Sacrifice,
     Use,
+    Judge,
+    EquipOff,
     Other
 }
