@@ -6,15 +6,18 @@ import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardLostType;
+import lombok.Getter;
 
 import java.util.Collections;
 
-public class JinkCardUseSettlement extends CardSettlement {
+public class JinkUseSettlement extends CardSettlement {
+    @Getter
     private CardUseDTO jinkUseDTO;
+    @Getter
     private CardUseDTO slashUseDTO;
 
-    public static JinkCardUseSettlement newOne(CardUseDTO slashUseDTO, CardUseDTO jinkUseDTO) {
-        JinkCardUseSettlement settlement = new JinkCardUseSettlement();
+    public static JinkUseSettlement newOne(CardUseDTO slashUseDTO, CardUseDTO jinkUseDTO) {
+        JinkUseSettlement settlement = new JinkUseSettlement();
         settlement.slashUseDTO = slashUseDTO;
         settlement.jinkUseDTO = jinkUseDTO;
         return settlement;
@@ -25,9 +28,6 @@ public class JinkCardUseSettlement extends CardSettlement {
         Player defender = jinkUseDTO.getPlayer();
         CardBase cardU = jinkUseDTO.getCard();
         defender.removeCard(e, Collections.singletonList(cardU), CardLostType.Use);
-        defender.getStageState().setUseCardCount(
-                defender.getStageState().getUseCardCount() + 1
-        );
         e.onCardLost(defender, CardLostType.Use, Collections.singletonList(jinkUseDTO.getCard()));
         e.onCardUsing(jinkUseDTO, this);
         e.onCardEffectFinish(jinkUseDTO, this);

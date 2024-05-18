@@ -9,8 +9,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class CardDiscardDTO {
-    private Player offender;
-    private Player defender;
+public class CardReframeDTO {
+    private Player player;
     private List<CardBase> card;
 }

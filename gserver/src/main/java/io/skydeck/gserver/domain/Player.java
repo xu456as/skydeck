@@ -3,8 +3,9 @@ package io.skydeck.gserver.domain;
 import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.*;
+import io.skydeck.gserver.exception.BizException;
 import io.skydeck.gserver.impl.DamageSettlement;
-import io.skydeck.gserver.impl.SlashCardUseSettlement;
+import io.skydeck.gserver.impl.SlashUseSettlement;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -31,6 +32,7 @@ public class Player implements Comparable<Player> {
     private List<TokenBase> tokens = new ArrayList<>();
     private List<SkillBase> skills = new ArrayList<>();
     private List<AbilityBase> abilities = new ArrayList<>();
+    private List<DynamicAbilityBase> dynamicAbilities = new ArrayList<>();
     private boolean expelled = false;
     private boolean chained = false;
     private StageState stageState;
@@ -82,12 +84,15 @@ public class Player implements Comparable<Player> {
                 .max(Integer::compareTo)
                 .orElse(1);
     }
+
     public int offensePoint() {
         return horseSum(GearCardBase::offensePoint, AbilityBase::offensePoint);
     }
+
     public int defensePoint() {
         return horseSum(GearCardBase::defensePoint, AbilityBase::defensePoint);
     }
+
     private int horseSum(Function<GearCardBase, Integer> cardFunc, Function<AbilityBase, Integer> abilityFunc) {
         int sum = 0;
         sum += equips.stream()
@@ -101,7 +106,7 @@ public class Player implements Comparable<Player> {
         return sum;
     }
 
-    public void onJinkSucceed(GameEngine engine, SlashCardUseSettlement settlement, Player offender, Player defender) {
+    public void onJinkSucceed(GameEngine engine, SlashUseSettlement settlement, Player offender, Player defender) {
         List<AbilityBase> abilities = allAbilities().stream()
                 .filter(abilityBase -> abilityBase.canActive(engine, DuckEvent.JinkUseDuck, this))
                 .collect(Collectors.toList());
@@ -110,11 +115,16 @@ public class Player implements Comparable<Player> {
         );
     }
 
+    public void removeDynamicAbility(GameEngine e, Enum event, Player player) {
+        dynamicAbilities.removeIf(da -> da.lostCheck(e, event, player));
+    }
+
 
     private List<AbilityBase> allAbilities() {
         List<AbilityBase> abilityList = new ArrayList<>();
         abilityList.addAll(skills);
         abilityList.addAll(abilities);
+        abilityList.addAll(dynamicAbilities);
         abilityList.addAll(primaryHero.skills());
         abilityList.addAll(viceHero.skills());
         if (!CollectionUtils.isEmpty(equips)) {
@@ -129,6 +139,13 @@ public class Player implements Comparable<Player> {
                 .filter(ab -> ab.canActive(engine, DamageEvent.DDamaged, this))
                 .toList();
         engine.batchQueryAbility(this, abilities, (ability) -> ability.onDDamaged(engine, settlement));
+    }
+
+    public void onLeavingDiscardPhase(GameEngine e, Player currentPlayer) {
+        List<AbilityBase> abilities = allAbilities().stream()
+                .filter(ab -> ab.canActive(e, PhaseEvent.LeavingDiscardPhase, currentPlayer))
+                .toList();
+        e.batchQueryAbility(this, abilities, (ability) -> ability.onLeavingDiscardPhase(e, currentPlayer));
     }
 
     public void acquireHand(GameEngine e, CardTransferContext ctc, List<CardBase> cards) {
@@ -152,6 +169,7 @@ public class Player implements Comparable<Player> {
             e.onHealthChanged(this, delta);
         }
     }
+
     public void removeCard(GameEngine e, List<CardBase> cards, CardLostType type) {
         List<CardBase> handToRemove = new ArrayList<>();
         List<CardBase> equipToRemove = new ArrayList<>();
@@ -187,5 +205,21 @@ public class Player implements Comparable<Player> {
                 .filter(ab -> ab.canActive(e, type, player))
                 .toList();
         e.batchQueryAbility(this, abList, (ab) -> ab.onCardLost(e, type, player));
+    }
+
+    public int incStageCount(String key) {
+        return incStageCount(key, 1);
+    }
+
+    public void addDynamicAbility(AbilityBase ability) {
+        //TODO
+    }
+
+    public int incStageCount(String key, int count) {
+        try {
+            return stageState.incCount(key, count);
+        } catch (Exception e) {
+            throw new BizException("can't increment stage count for key[%s]".formatted(key), e);
+        }
     }
 }

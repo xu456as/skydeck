@@ -2,6 +2,7 @@ package io.skydeck.gserver.engine;
 
 import io.skydeck.gserver.domain.*;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
+import io.skydeck.gserver.domain.dto.CardReframeDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.enums.*;
@@ -11,7 +12,6 @@ import jakarta.annotation.Resource;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class GameEngine {
+    private VisibilityManager visibilityManager;
     @Resource
     private AbilityFactory abilityFactory;
     @Resource
@@ -38,6 +39,8 @@ public class GameEngine {
     private Phase currentPhase;
     private SettlementBase currentSettlement;
     private Queue<CsBufferItem> csBuffer = new LinkedList<>();
+    private Player gainStagePlayer = null;
+    private Player roundPlayer = null;
 
 //    private Queue<SettlementBase> settlementQueue;
 
@@ -56,16 +59,18 @@ public class GameEngine {
                 if (p.isDead()) {
                     continue;
                 }
-                if(p.getKingdom() == kingdom) {
+                if (p.getKingdom() == kingdom) {
                     ++count;
                 }
             }
             return count;
         }
     }
+
     public int distance(Player offender, Player defender) {
         return PositionUtil.distance(offender, defender, players);
     }
+
     @SuppressWarnings("DuplicateBranchesInSwitch")
     public boolean canSelectAsCardTarget(Player offender, Player defender, CardBase card) {
         boolean val = offender.canSelectAsCardTarget(defender, card);
@@ -105,12 +110,12 @@ public class GameEngine {
                 return offender != defender && distance(offender, defender) <= 1;
             case ThrivePloy:
             case LightningPloy:
-            case MoreStagePloy:
-                return offender == defender;
+            case GainStagePloy:
+                return offender == defender && fromGiantKingdom(offender);
             case StealWeaponPloy:
                 return offender != defender
                         && defender.getEquips().stream().anyMatch(equip -> equip.subType() == CardSubType.Weapon);
-            case MutualBenefitPloy:
+            case AllianceCheerPloy:
             case MutualThrivePloy:
                 return offender != defender
                         && offender.getKingdom() != Kingdom.Unknown && defender.getKingdom() != Kingdom.Unknown
@@ -123,8 +128,9 @@ public class GameEngine {
         }
         return false;
     }
+
     public void mainLoop() {
-        for (; ; currentPlayer = PositionUtil.nextAlivePlayer(currentPlayer, players)) {
+        for (; ; currentPlayer = nextPlayer()) {
             if (!this.preStartCheck()) {
                 continue;
             }
@@ -185,6 +191,7 @@ public class GameEngine {
         settlement.resolve(this);
         purgeCsBuffer();
     }
+
     public void addToCsBuffer(Player player, List<CardBase> cards, CardLostType type) {
         if (CollectionUtils.isEmpty(cards)) {
             return;
@@ -195,6 +202,7 @@ public class GameEngine {
     public boolean checkCsBuffer(CardBase card) {
         return csBuffer.stream().anyMatch(item -> item.cards.contains(card));
     }
+
     public List<CardBase> recycleCsBuffer(CardBase card) {
         return csBuffer.stream()
                 .filter(item -> item.cards.contains(card))
@@ -216,6 +224,7 @@ public class GameEngine {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
+
     private void purgeCsBuffer() {
         while (!csBuffer.isEmpty()) {
             CsBufferItem item = csBuffer.poll();
@@ -228,6 +237,12 @@ public class GameEngine {
 
     /* Events Begin*/
     public void onCardUsing(CardUseDTO dto, CardSettlement settlement) {
+        Player user = dto.getPlayer();
+        CardBase card = dto.getCard();
+        user.incStageCount("useCardCount");
+        if (card.subType() == CardSubType.Slash) {
+            user.incStageCount("useSlashCount");
+        }
     }
 
     public void onCardTargeting(CardUseDTO dto, CardSettlement settlement) {
@@ -250,18 +265,31 @@ public class GameEngine {
     }
 
     public void onCardSacrificing(CardSacrificeDTO dto, CardSacrificeSettlement settlement) {
+        dto.getPlayer().incStageCount("sacrificeCardCount");
     }
 
     public void onCardSacrificed(CardSacrificeDTO dto, CardSacrificeSettlement settlement) {
     }
+    public void onCardReframing(CardReframeDTO dto, CardReframeSettlement settlement) {
+        dto.getPlayer().incStageCount("reframeCardCount");
+    }
 
+    public void onCardDiscarding(CardDiscardDTO dto, CardDiscardSettlement settlement) {
+        if (CollectionUtils.isNotEmpty(dto.getCard())) {
+            dto.getOffender().incStageCount("discardCardCount", dto.getCard().size());
+        }
+    }
     public void onCardDiscarded(CardDiscardDTO dto, CardDiscardSettlement settlement) {
+
     }
 
     public void onCardLosing() {
     }
 
     public void onCardLost(Player player, Enum type, List<CardBase> cards) {
+        if (CollectionUtils.isNotEmpty(cards)) {
+            player.incStageCount("lostCardCount", cards.size());
+        }
     }
 
     public boolean onDealingDamage(DamageSettlement settlement) {
@@ -326,6 +354,12 @@ public class GameEngine {
     }
 
     public void onStart() {
+        for (Player player : PositionUtil.positionSort(currentPlayer, players)) {
+            if (player.isDead()) {
+                continue;
+            }
+            player.removeDynamicAbility(this, PhaseEvent.Start, currentPlayer);
+        }
     }
 
     public void onPreparePhase() {
@@ -347,6 +381,7 @@ public class GameEngine {
     }
 
     public void onLeavingDrawPhase() {
+
     }
 
     public void onPreEnterActivePhase() {
@@ -380,12 +415,24 @@ public class GameEngine {
     }
 
     public void onLeavingDiscardPhase() {
+        for (Player player : PositionUtil.positionSort(currentPlayer, players)) {
+            if (player.isDead()) {
+                continue;
+            }
+            player.onLeavingDiscardPhase(this, currentPlayer);
+        }
     }
 
     public void onEndPhase() {
     }
 
     public void onYield() {
+        for (Player player : PositionUtil.positionSort(currentPlayer, players)) {
+            if (player.isDead()) {
+                continue;
+            }
+            player.removeDynamicAbility(this, PhaseEvent.Yield, currentPlayer);
+        }
     }
 
     public void onCardBurying(Player player, List<CardBase> cards, Enum type) {
@@ -396,7 +443,7 @@ public class GameEngine {
     }
 
 
-    public void onJinkSucceed(SlashCardUseSettlement settlement, Player offender, Player defender) {
+    public void onJinkSucceed(SlashUseSettlement settlement, Player offender, Player defender) {
         for (Player player : PositionUtil.positionSort(currentPlayer, players)) {
             if (player.isDead()) {
                 continue;
@@ -427,11 +474,36 @@ public class GameEngine {
     public void onHealthChanged(Player player, int amount) {
     }
 
+    public void yieldStageToPlayer(Player player) {
+        gainStagePlayer = player;
+        if (roundPlayer == null) {
+            roundPlayer = currentPlayer;
+        }
+    }
+    private Player nextPlayer() {
+        if (gainStagePlayer != null) {
+            Player temp = gainStagePlayer;
+            gainStagePlayer = null;
+            roundPlayer = currentPlayer;
+            return temp;
+        }
+        if (roundPlayer != null) {
+            Player temp = roundPlayer;
+            roundPlayer = null;
+            return PositionUtil.nextAlivePlayer(temp, players);
+        }
+        return PositionUtil.nextAlivePlayer(currentPlayer, players);
+    }
+    public boolean fromGiantKingdom(Player player) {
+        //TODO
+        return false;
+    }
 
     private static class CsBufferItem {
         private Player owner;
         private List<CardBase> cards;
         private CardLostType lostType;
+
         static CsBufferItem newOne(Player owner, List<CardBase> cards, CardLostType type) {
             CsBufferItem item = new CsBufferItem();
             item.owner = owner;

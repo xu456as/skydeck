@@ -6,7 +6,7 @@ import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.*;
-import io.skydeck.gserver.impl.SlashCardUseSettlement;
+import io.skydeck.gserver.impl.SlashUseSettlement;
 
 import java.util.Collections;
 import java.util.List;
@@ -100,7 +100,7 @@ public class GuanShiFuCard extends GearCardBase {
             return "GuanShiFu";
         }
         @Override
-        public void onJinkSucceed(GameEngine engine, SlashCardUseSettlement settlement, Player offender, Player defender) {
+        public void onJinkSucceed(GameEngine engine, SlashUseSettlement settlement, Player offender, Player defender) {
             if (!offender.getEquips().contains(GuanShiFuCard.this)) {
                 return;
             }

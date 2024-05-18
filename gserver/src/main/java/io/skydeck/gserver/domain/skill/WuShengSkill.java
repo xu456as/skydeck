@@ -15,7 +15,7 @@ import io.skydeck.gserver.enums.CardSubType;
 import io.skydeck.gserver.enums.Color;
 import io.skydeck.gserver.enums.Suit;
 import io.skydeck.gserver.impl.CardSacrificeSettlement;
-import io.skydeck.gserver.impl.SlashCardUseSettlement;
+import io.skydeck.gserver.impl.SlashUseSettlement;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
@@ -60,7 +60,7 @@ public class WuShengSkill extends SkillBase {
                 cardUseDTO.setPlayer(player);
                 cardUseDTO.setCard(dCard);
                 cardUseDTO.addTarget(target);
-                actionDTO.setOutput(SlashCardUseSettlement.newOne(cardUseDTO));
+                actionDTO.setOutput(SlashUseSettlement.newOne(cardUseDTO));
             }
         }
     }

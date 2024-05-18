@@ -2,9 +2,12 @@ package io.skydeck.gserver.domain;
 
 import io.skydeck.gserver.annotation.DValue;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class StageState {
@@ -30,6 +33,8 @@ public class StageState {
     private Integer killCount;
     @DValue("0")
     private Integer useCardCount;
+    @DValue("0")
+    private Integer reframeCardCount;
     @DValue("0")
     private Integer sacrificeCardCount;
     @DValue("0")
@@ -57,6 +62,21 @@ public class StageState {
     @DValue("0")
     private Integer handGiftCount;
 
+    private static final Map<String, Field> FIELD_MAP = buildFieldMap();
+    private static Map<String, Field> buildFieldMap() {
+        Field[] fields = StageState.class.getDeclaredFields();
+        Map<String, Field> fieldMap = new HashMap<>();
+        for (Field field : fields) {
+            DValue dValue = field.getAnnotation(DValue.class);
+            if (dValue == null) {
+                continue;
+            }
+            field.setAccessible(true);
+            fieldMap.put(field.getName(), field);
+        }
+        return fieldMap;
+    }
+
     public void resetDefault() throws Exception {
         Field[] fields = StageState.class.getDeclaredFields();
         for (Field field : fields) {
@@ -76,5 +96,17 @@ public class StageState {
                 field.set(this, val);
             }
         }
+    }
+    public int incCount(String key) throws Exception {
+        return incCount(key, 1);
+    }
+    public int incCount(String key, int count) throws Exception {
+        Field field = FIELD_MAP.get(key);
+        if (field == null || !Integer.class.equals(field.getType())) {
+            return -1;
+        }
+        int intVal = field.getInt(this);
+        field.set(this, intVal + count);
+        return intVal;
     }
 }

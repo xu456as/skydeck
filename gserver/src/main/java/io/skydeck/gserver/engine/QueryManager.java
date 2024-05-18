@@ -1,6 +1,7 @@
 package io.skydeck.gserver.engine;
 
 import io.skydeck.gserver.domain.AbilityBase;
+import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.CardFilterIface;
 import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
@@ -13,10 +14,26 @@ import java.util.List;
 
 @Component
 public class QueryManager {
+
+    public static final int AREA_HAND = 1;
+    public static final int AREA_EQUIP = 2;
+    public static final int AREA_JUDGE = 4;
+
+    public static final int AREA_OWN = AREA_HAND | AREA_EQUIP;
+
+    public static final int AREA_ALL = AREA_OWN | AREA_JUDGE;
+
+
     //TODO
     public CardUseDTO cardUseQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
     public CardSacrificeDTO cardSacrificeQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
     public CardDiscardDTO cardDiscardQuery(Player player, int count, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
+    public CardDiscardDTO handCardDiscardQuery(Player player, int count, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
+
+    public CardBase pickOneCard(Player offender, Player defender, int allowArea) {
+        //TODO
+        return null;
+    }
 
     public AbilityBase abilitiesQuery(Player player, List<AbilityBase> abilityList) {
         //TODO
@@ -26,10 +43,23 @@ public class QueryManager {
         //TODO
         return -1;
     }
+    public int optionQuery(Player player, String... options) {
+        //TODO
+        return -1;
+    }
+    public int optionQuery(Player player, List<String> options) {
+        //TODO
+        return -1;
+    }
 
     public int abilityOptionQuery(Player player, AbilityBase ability, List<TextDictionary> options) {
         //TODO
         return -1;
+    }
+
+    public CardBase handCardPickQuery(Player player) {
+        //TODO
+        return null;
     }
 
 }

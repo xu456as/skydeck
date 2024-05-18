@@ -8,20 +8,22 @@ import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.CardLostType;
 import io.skydeck.gserver.util.PositionUtil;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.*;
 
-public class SlashCardUseSettlement extends CardSettlement {
+public class SlashUseSettlement extends CardSettlement {
+    @Getter
     private CardUseDTO cardUseDTO;
     private Map<Player, Integer> damageCountMap = new HashMap<>();
     private Map<Player, Integer> jinkQueryCountMap = new HashMap<>();
 
     private Set<Player> jinkSuccessSet = new HashSet<>();
 
-    public static SlashCardUseSettlement newOne(CardUseDTO useDTO) {
-        SlashCardUseSettlement settlement = new SlashCardUseSettlement();
+    public static SlashUseSettlement newOne(CardUseDTO useDTO) {
+        SlashUseSettlement settlement = new SlashUseSettlement();
         settlement.cardUseDTO =  useDTO;
         return settlement;
     }
@@ -36,8 +38,6 @@ public class SlashCardUseSettlement extends CardSettlement {
 
         Player user = cardUseDTO.getPlayer();
         user.removeCard(engine, Collections.singletonList(cardUseDTO.getCard()), CardLostType.Use);
-        user.getStageState().setUseCardCount(user.getStageState().getUseCardCount() + 1);
-        user.getStageState().setUseSlashCount(user.getStageState().getUseSlashCount() + 1);
         engine.onCardLost(user, CardLostType.Use, Collections.singletonList(cardUseDTO.getCard()));
         engine.onCardUsing(cardUseDTO, this);
         engine.onCardTargeting(cardUseDTO, this);
@@ -49,7 +49,7 @@ public class SlashCardUseSettlement extends CardSettlement {
                 int effectCnt = targetMap.get(target);
                 for (int i = 0; i < effectCnt; i++) {
                     boolean valid = engine.onCardEffecting(cardUseDTO, this, target);
-                    if (!valid) {
+                    if (!valid || target.isDead()) {
                         continue;
                     }
                     int jinkCount = jinkQueryCountMap.getOrDefault(target, 1);
@@ -60,7 +60,7 @@ public class SlashCardUseSettlement extends CardSettlement {
                         if (jinkUse == null) {
                             break;
                         }
-                        JinkCardUseSettlement jinkSettlement = JinkCardUseSettlement.newOne(cardUseDTO, jinkUse);
+                        JinkUseSettlement jinkSettlement = JinkUseSettlement.newOne(cardUseDTO, jinkUse);
                         jinkSettlement.resolve(engine);
                         validJink++;
                     }

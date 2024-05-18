@@ -37,7 +37,7 @@ public class DyingSettlement extends SettlementBase {
                 allCards.addAll(killer.getEquips());
                 allCards.addAll(killer.getHands());
                 engine.runSettlement(CardDiscardSettlement.newOne(
-                        CardDiscardDTO.builder().player(killer).card(allCards).build()
+                        CardDiscardDTO.builder().offender(killer).defender(killer).card(allCards).build()
                 ));
             } else {
                 List<CardBase> reward = engine.getPcrManager().pollDeckTop(engine.aliveTeamMember(deceased));

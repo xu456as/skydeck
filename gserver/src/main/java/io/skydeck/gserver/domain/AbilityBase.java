@@ -4,7 +4,7 @@ import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.AbilityTag;
 import io.skydeck.gserver.impl.DamageSettlement;
-import io.skydeck.gserver.impl.SlashCardUseSettlement;
+import io.skydeck.gserver.impl.SlashUseSettlement;
 
 import java.util.Collections;
 import java.util.Set;
@@ -147,7 +147,7 @@ public abstract class AbilityBase {
     public void onDiscardPhase() {
     }
 
-    public void onLeavingDiscardPhase() {
+    public void onLeavingDiscardPhase(GameEngine e, Player currentPlayer) {
     }
 
     public void onEndPhase() {
@@ -156,7 +156,7 @@ public abstract class AbilityBase {
     public void onYield() {
     }
 
-    public void onJinkSucceed(GameEngine engine, SlashCardUseSettlement settlement, Player offender, Player defender) {
+    public void onJinkSucceed(GameEngine engine, SlashUseSettlement settlement, Player offender, Player defender) {
 
     }
     public void proactiveAction(GameEngine engine, Player player, ProactiveActionDTO proactiveActionDTO) {

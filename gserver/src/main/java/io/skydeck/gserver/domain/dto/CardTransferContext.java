@@ -11,4 +11,8 @@ public class CardTransferContext {
     private CardAcquireWay acquireWay;
     private Player source;
 
+    public static CardTransferContext draw() {
+        return CardTransferContext.builder().acquireWay(CardAcquireWay.Draw).build();
+    }
+
 }

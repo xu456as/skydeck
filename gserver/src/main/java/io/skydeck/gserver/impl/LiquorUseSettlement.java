@@ -6,15 +6,17 @@ import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardLostType;
+import lombok.Getter;
 
 import java.util.Collections;
 
-public class LiquorCardUseSettlement extends CardSettlement {
+public class LiquorUseSettlement extends CardSettlement {
 
+    @Getter
     private CardUseDTO cardUseDTO;
 
-    public static LiquorCardUseSettlement newOne(CardUseDTO cardUseDTO) {
-        LiquorCardUseSettlement settlement = new LiquorCardUseSettlement();
+    public static LiquorUseSettlement newOne(CardUseDTO cardUseDTO) {
+        LiquorUseSettlement settlement = new LiquorUseSettlement();
         settlement.cardUseDTO = cardUseDTO;
         return settlement;
     }
@@ -24,9 +26,6 @@ public class LiquorCardUseSettlement extends CardSettlement {
         Player user = cardUseDTO.getPlayer();
         CardBase cardU = cardUseDTO.getCard();
         user.removeCard(e, Collections.singletonList(cardU), CardLostType.Use);
-        user.getStageState().setUseCardCount(
-                user.getStageState().getUseCardCount() + 1
-        );
         e.onCardLost(user, CardLostType.Use, Collections.singletonList(cardU));
         e.onCardUsing(cardUseDTO, this);
         if (user.isInDanger()) {

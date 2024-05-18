@@ -7,17 +7,19 @@ import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardLostType;
 import io.skydeck.gserver.util.PositionUtil;
+import lombok.Getter;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class CureCardUseSettlement extends CardSettlement {
+public class CureUseSettlement extends CardSettlement {
+    @Getter
     private CardUseDTO cardUseDTO;
 
-    public static CureCardUseSettlement newOne(CardUseDTO cureCardUse) {
-        CureCardUseSettlement settlement = new CureCardUseSettlement();
+    public static CureUseSettlement newOne(CardUseDTO cureCardUse) {
+        CureUseSettlement settlement = new CureUseSettlement();
         settlement.cardUseDTO =  cureCardUse;
         return settlement;
     }
@@ -27,9 +29,6 @@ public class CureCardUseSettlement extends CardSettlement {
         Player user = cardUseDTO.getPlayer();
         CardBase cardU = cardUseDTO.getCard();
         user.removeCard(e, Collections.singletonList(cardU), CardLostType.Use);
-        user.getStageState().setUseCardCount(
-                user.getStageState().getUseCardCount() + 1
-        );
         e.onCardLost(user, CardLostType.Use, Collections.singletonList(cardUseDTO.getCard()));
         e.onCardUsing(cardUseDTO, this);
         Map<Player, Integer> targetMap = cardUseDTO.getTargets();

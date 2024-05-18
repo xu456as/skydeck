@@ -45,10 +45,10 @@ public class InDangerSettlement extends SettlementBase {
             }
             if (cardUseDTO != null) {
                 if (cardUseDTO.getCard().subType() == CardSubType.Cure) {
-                    CureCardUseSettlement settlement = CureCardUseSettlement.newOne(cardUseDTO);
+                    CureUseSettlement settlement = CureUseSettlement.newOne(cardUseDTO);
                     settlement.resolve(engine);
                 } else if (cardUseDTO.getCard().subType() == CardSubType.Liquor) {
-                    LiquorCardUseSettlement settlement = LiquorCardUseSettlement.newOne(cardUseDTO);
+                    LiquorUseSettlement settlement = LiquorUseSettlement.newOne(cardUseDTO);
                     settlement.resolve(engine);
                 }
             }

@@ -6,11 +6,12 @@ import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardLostType;
+import lombok.Getter;
 
 import java.util.Collections;
 
 public class CardSacrificeSettlement extends CardSettlement {
-
+    @Getter
     private CardSacrificeDTO cardSacrificeDTO;
 
     public static CardSacrificeSettlement newOne(CardSacrificeDTO cardSacrificeDTO) {
@@ -24,9 +25,6 @@ public class CardSacrificeSettlement extends CardSettlement {
         Player player = cardSacrificeDTO.getPlayer();
         CardBase cardS = cardSacrificeDTO.getCard();
         player.removeCard(e, Collections.singletonList(cardS), CardLostType.Sacrifice);
-        player.getStageState().setSacrificeCardCount(
-                player.getStageState().getSacrificeCardCount() + 1
-        );
         e.onCardLost(player, CardLostType.Sacrifice, Collections.singletonList(cardSacrificeDTO.getCard()));
         e.onCardSacrificing(cardSacrificeDTO, this);
         e.onCardSacrificed(cardSacrificeDTO, this);

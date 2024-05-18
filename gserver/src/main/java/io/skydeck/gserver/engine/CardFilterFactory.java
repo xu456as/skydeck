@@ -3,8 +3,10 @@ package io.skydeck.gserver.engine;
 import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.CardFilterIface;
 import io.skydeck.gserver.enums.CardSubType;
+import io.skydeck.gserver.enums.Suit;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 @Component
@@ -13,11 +15,19 @@ public class CardFilterFactory {
         return func::apply;
     }
 
+    public CardFilterIface suitFilter(Suit... suits) {
+        return (CardBase card) -> {
+            return Arrays.stream(suits)
+                    .anyMatch(suit -> suit.equals(card.suit()));
+        };
+    }
+
     public CardFilterIface jinkFilter() {
         return (CardBase card) -> card.subType() == CardSubType.Jink;
     }
 
     public CardFilterIface cureFilter() {return (CardBase  card) -> card.subType() == CardSubType.Cure;}
+    public CardFilterIface slashFilter() {return (CardBase  card) -> card.subType() == CardSubType.Slash;}
 
     public CardFilterIface liquorFilter() { return (CardBase card) -> card.subType() == CardSubType.Liquor; }
 

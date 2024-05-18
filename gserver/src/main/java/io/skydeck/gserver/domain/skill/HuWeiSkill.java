@@ -51,7 +51,7 @@ public class HuWeiSkill extends SkillBase {
             case 0:
                 owner.getStageState().setSlashQuota(owner.getStageState().getSlashQuota() + 1);
                 engine.runSettlement(CardDiscardSettlement.newOne(CardDiscardDTO.builder()
-                        .player(target).card(target.getEquips().stream().map(e->(CardBase)e).toList()).build())
+                        .offender(target).defender(target).card(target.getEquips().stream().map(e->(CardBase)e).toList()).build())
                 );
                 break;
             case 1:
