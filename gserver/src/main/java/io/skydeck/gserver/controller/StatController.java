@@ -14,7 +14,7 @@ public class StatController {
     private GameEngine engine;
     @GetMapping("/test")
     public Integer test() {
-        engine.onActivePhase();
+//        engine.onActivePhase();
         return 0;
     }
 }
