@@ -8,7 +8,6 @@ import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 
-//TODO
 public class DismantleUseSettlement extends PloyCardSettlement {
 
     public DismantleUseSettlement newOne(CardUseDTO useDTO) {

@@ -11,6 +11,7 @@ import io.skydeck.gserver.i18n.TextDictionary;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class QueryManager {
@@ -48,6 +49,15 @@ public class QueryManager {
         return -1;
     }
     public int optionQuery(Player player, List<String> options) {
+        //TODO
+        return -1;
+    }
+    public int optionQuery(Player player, List<String> options, int optMask) {
+        //TODO
+        return -1;
+    }
+
+    public int optionQuery(Player player, Map<Integer, String> options) {
         //TODO
         return -1;
     }

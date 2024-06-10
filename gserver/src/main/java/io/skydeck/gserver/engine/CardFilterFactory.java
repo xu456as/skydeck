@@ -3,6 +3,7 @@ package io.skydeck.gserver.engine;
 import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.CardFilterIface;
 import io.skydeck.gserver.enums.CardSubType;
+import io.skydeck.gserver.enums.CardType;
 import io.skydeck.gserver.enums.Suit;
 import org.springframework.stereotype.Component;
 
@@ -55,5 +56,9 @@ public class CardFilterFactory {
 
     public CardFilterIface not(CardFilterIface filter) {
         return (CardBase card)  -> !filter.filter(card);
+    }
+
+    public CardFilterIface gearFilter() {
+        return (CardBase card) -> card.type() == CardType.Gear;
     }
 }

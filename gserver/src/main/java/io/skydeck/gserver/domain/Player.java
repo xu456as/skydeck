@@ -152,9 +152,14 @@ public class Player implements Comparable<Player> {
         //TODO add alarm
         hands.addAll(cards);
     }
-
+    public void updateHeroActive(int index, boolean active) {
+        switch (index) {
+            case 0 -> primaryHero.setActive(active);
+            case 1 -> viceHero.setActive(active);
+        }
+    }
     public void updateHealth(GameEngine e, int amount) {
-        if (stageState.getHealthLocked()) {
+        if (stageState.getHealthLocked() || stageState.getInLimbo()) {
             return;
         }
         int delta = 0;

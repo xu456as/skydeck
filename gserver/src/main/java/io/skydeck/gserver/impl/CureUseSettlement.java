@@ -25,7 +25,6 @@ public class CureUseSettlement extends CardSettlement {
     }
     @Override
     public void resolve(GameEngine e) {
-        //TODO
         Player user = cardUseDTO.getPlayer();
         CardBase cardU = cardUseDTO.getCard();
         user.removeCard(e, Collections.singletonList(cardU), CardLostType.Use);

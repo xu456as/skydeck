@@ -20,10 +20,11 @@ public class CardDiscardSettlement extends CardSettlement {
     }
     @Override
     public void resolve(GameEngine e) {
-        Player offender = discardDTO.getDefender();
+        Player offender = discardDTO.getOffender();
         Player defender = discardDTO.getDefender();
+        List<CardBase> cardDiscard = e.onCardLosing(discardDTO.getDefender(), CardLostType.Stolen, discardDTO.getCard());
+        discardDTO.setCard(cardDiscard);
         e.onCardDiscarding(discardDTO, this);
-        List<CardBase> cardDiscard = discardDTO.getCard();
         defender.removeCard(e, cardDiscard, CardLostType.Discard);
         e.onCardLost(defender, CardLostType.Discard, cardDiscard);
         e.onCardDiscarded(discardDTO, this);

@@ -283,7 +283,9 @@ public class GameEngine {
 
     }
 
-    public void onCardLosing() {
+    public List<CardBase> onCardLosing(Player player, Enum type, List<CardBase> cards) {
+        //TODO
+        return null;
     }
 
     public void onCardLost(Player player, Enum type, List<CardBase> cards) {

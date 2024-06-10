@@ -16,7 +16,7 @@ import java.util.Set;
 public class GainStageUseSettlement extends PloyCardSettlement {
     @Override
     public void resolve(GameEngine engine) {
-        //TODO
+        commonResolve(engine, this::bizResolve);
     }
     private void bizResolve(GameEngine e, Player target) {
         target.addDynamicAbility(new DynamicAbilityBase() {

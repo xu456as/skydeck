@@ -7,6 +7,8 @@ import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.engine.VisibilityManager;
 import io.skydeck.gserver.i18n.TextDictionary;
 
+import java.util.stream.Stream;
+
 public class GlanceUseSettlement extends PloyCardSettlement {
     @Override
     public void resolve(GameEngine e) {
@@ -17,7 +19,10 @@ public class GlanceUseSettlement extends PloyCardSettlement {
         Player user = useDTO.getPlayer();
         QueryManager qm = e.getQueryManager();
         VisibilityManager vm = e.getVisibilityManager();
-        int idx = qm.optionQuery(user, TextDictionary.glanceOption());
+        int idx = qm.optionQuery(user,
+                Stream.of(TextDictionary.PeekHand, TextDictionary.PeekPrimaryHero, TextDictionary.PeekViceHero)
+                .map(TextDictionary::i18n).toList()
+        );
         switch (idx) {
             case 0:
                 vm.peekCard(user, target.getHands());

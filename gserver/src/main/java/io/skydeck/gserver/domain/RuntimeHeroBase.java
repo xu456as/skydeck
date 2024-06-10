@@ -3,6 +3,7 @@ package io.skydeck.gserver.domain;
 import io.skydeck.gserver.engine.AbilityFactory;
 import io.skydeck.gserver.engine.GameEngine;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +13,9 @@ public abstract class RuntimeHeroBase {
     protected Player player;
     @Getter
     protected StaticHeroBase staticHero;
+    @Getter
+    @Setter
+    protected boolean active = false;
     private RuntimeHeroBase(Player player, StaticHeroBase hero) {
         this.player = player;
         this.staticHero = hero;

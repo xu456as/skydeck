@@ -10,7 +10,16 @@ public enum TextDictionary {
     GainDamagingCard,
 
     HuWeiOpt0,
-    HuWeiOpt1;
+    HuWeiOpt1,
+    PeekHand,
+    PeekPrimaryHero,
+    PeekViceHero,
+
+    DropOneHealth,
+    DiscardGear,
+    ExposePrimaryHero,
+    ExposeViceHero
+    ;
 
 
     public static List<String> allianceCheerOption(int val) {
@@ -20,11 +29,16 @@ public enum TextDictionary {
         }
         return newList;
     }
-    public static List<String> glanceOption() {
-        return new ArrayList<>(){{
-            add("checkHand");
-            add("checkPrimaryHero");
-            add("checkViceHero");
-        }};
+    public static int mask(int... indices) {
+        int mask = 0;
+        for (int ind : indices) {
+            mask |= ind;
+        }
+        return mask;
+    }
+
+    public String i18n() {
+        //TODO
+        return "todo";
     }
 }
