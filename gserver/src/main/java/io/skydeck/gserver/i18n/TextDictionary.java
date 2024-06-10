@@ -18,7 +18,9 @@ public enum TextDictionary {
     DropOneHealth,
     DiscardGear,
     ExposePrimaryHero,
-    ExposeViceHero
+    ExposeViceHero,
+    Steal,
+    Dismantle
     ;
 
 

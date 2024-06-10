@@ -38,8 +38,8 @@ public class EnhancedDismantleUseSettlement extends PloyCardSettlement {
         QueryManager qm = e.getQueryManager();
         if (enhanced) {
             Map<Integer, String> options = new HashMap<>(){{
-                put(0, TextDictionary.steal());
-                put(1, TextDictionary.dismantle());
+                put(0, TextDictionary.Steal.i18n());
+                put(1, TextDictionary.Dismantle.i18n());
             }};
             while (!options.isEmpty()) {
                 int index = qm.optionQuery(user, options);
