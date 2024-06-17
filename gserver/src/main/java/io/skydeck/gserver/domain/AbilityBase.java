@@ -1,5 +1,6 @@
 package io.skydeck.gserver.domain;
 
+import io.skydeck.gserver.annotation.I18n;
 import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.AbilityTag;
@@ -7,6 +8,7 @@ import io.skydeck.gserver.impl.DamageSettlement;
 import io.skydeck.gserver.impl.SlashUseSettlement;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Set;
 
 public abstract class AbilityBase {
@@ -19,6 +21,18 @@ public abstract class AbilityBase {
     public boolean canActive(GameEngine engine, Enum event, Player player) {return false;}
 
     public String name() {
+        return nameI18n(null);
+    }
+    public String nameI18n(Locale locale) {
+        I18n i18n = this.getClass().getAnnotation(I18n.class);
+        if (locale == Locale.CHINA) {
+            if (i18n != null) {
+                return i18n.zhCn();
+            }
+        }
+        if (i18n != null) {
+            return i18n.value();
+        }
         return "";
     }
 

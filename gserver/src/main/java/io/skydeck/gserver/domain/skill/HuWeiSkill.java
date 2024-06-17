@@ -1,6 +1,7 @@
 package io.skydeck.gserver.domain.skill;
 
 import io.skydeck.gserver.annotation.AbilityName;
+import io.skydeck.gserver.annotation.I18n;
 import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.SkillBase;
@@ -15,12 +16,17 @@ import io.skydeck.gserver.impl.CardDiscardSettlement;
 import io.skydeck.gserver.impl.DamageSettlement;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 @AbilityName("HuWei")
+@I18n(value = "HuWei")
 public class HuWeiSkill extends SkillBase {
+
+
+
     private Player owner;
     public HuWeiSkill(Player owner) {
         this.owner = owner;
@@ -28,11 +34,6 @@ public class HuWeiSkill extends SkillBase {
     @Override
     public Set<AbilityTag> tags() {
         return Collections.singleton(AbilityTag.OneOff);
-    }
-
-    @Override
-    public String name() {
-        return "HuWei";
     }
 
     @Override

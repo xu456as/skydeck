@@ -36,6 +36,11 @@ public class QueryManager {
         return null;
     }
 
+    public int cardQuery(Player player, List<CardBase> cards) {
+        //TODO
+        return -1;
+    }
+
     public AbilityBase abilitiesQuery(Player player, List<AbilityBase> abilityList) {
         //TODO
         return null;
@@ -48,6 +53,7 @@ public class QueryManager {
         //TODO
         return -1;
     }
+
     public int optionQuery(Player player, List<String> options) {
         //TODO
         return -1;

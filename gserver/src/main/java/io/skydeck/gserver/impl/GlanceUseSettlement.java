@@ -2,6 +2,7 @@ package io.skydeck.gserver.impl;
 
 import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.PloyCardSettlement;
+import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.engine.VisibilityManager;
@@ -10,6 +11,11 @@ import io.skydeck.gserver.i18n.TextDictionary;
 import java.util.stream.Stream;
 
 public class GlanceUseSettlement extends PloyCardSettlement {
+    public static GlanceUseSettlement newOne(CardUseDTO useDTO) {
+        GlanceUseSettlement settlement = new GlanceUseSettlement();
+        settlement.useDTO = useDTO;
+        return settlement;
+    }
     @Override
     public void resolve(GameEngine e) {
         commonResolve(e, this::bizResolve);

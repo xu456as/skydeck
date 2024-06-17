@@ -4,6 +4,7 @@ import io.skydeck.gserver.domain.CardBase;
 import io.skydeck.gserver.domain.Player;
 import io.skydeck.gserver.domain.PloyCardSettlement;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
+import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
@@ -16,6 +17,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GroupExposeUseSettlement extends PloyCardSettlement {
+    public static GroupExposeUseSettlement newOne(CardUseDTO useDTO) {
+        GroupExposeUseSettlement settlement = new GroupExposeUseSettlement();
+        settlement.useDTO = useDTO;
+        return settlement;
+    }
 
     @Override
     public void resolve(GameEngine e) {

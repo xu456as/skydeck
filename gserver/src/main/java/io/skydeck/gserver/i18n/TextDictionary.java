@@ -31,13 +31,6 @@ public enum TextDictionary {
         }
         return newList;
     }
-    public static int mask(int... indices) {
-        int mask = 0;
-        for (int ind : indices) {
-            mask |= ind;
-        }
-        return mask;
-    }
 
     public String i18n() {
         //TODO
