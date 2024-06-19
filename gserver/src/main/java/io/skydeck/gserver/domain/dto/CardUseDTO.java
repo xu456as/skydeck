@@ -22,6 +22,9 @@ public class CardUseDTO {
     private CardBase card;
     @Getter
     private Map<Player, Integer> targets = new HashMap<>();
+    @Getter
+    @Setter
+    private Object extraInfo;
 
     public CardUseDTO addTarget(Player target) {
         targets.put(target, 1);

@@ -61,6 +61,10 @@ public class StageState {
     private Boolean recoverDisabled;
     @DValue("0")
     private Integer handGiftCount;
+    @DValue("false")
+    private Boolean skipNextDrawPhase;
+    @DValue("false")
+    private Boolean skipNextActivePhase;
 
     private static final Map<String, Field> FIELD_MAP = buildFieldMap();
     private static Map<String, Field> buildFieldMap() {

@@ -16,7 +16,6 @@ import io.skydeck.gserver.impl.CardDiscardSettlement;
 import io.skydeck.gserver.impl.DamageSettlement;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -57,7 +56,7 @@ public class HuWeiSkill extends SkillBase {
                 break;
             case 1:
                 engine.runSettlement(
-                        DamageSettlement.newOne(player, target, 1, DamageNature.Common, null)
+                        DamageSettlement.newOne(player, target, 1, DamageNature.Normal, null)
                 );
                 break;
         }

@@ -2,7 +2,7 @@ package io.skydeck.gserver.enums;
 
 public enum DamageNature {
     None,
-    Common,
+    Normal,
     Lightning,
     Fire,
     Ice

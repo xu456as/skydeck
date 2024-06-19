@@ -293,6 +293,11 @@ public class GameEngine {
             player.incStageCount("lostCardCount", cards.size());
         }
     }
+    public void onCardJudgeEffecting(CardJudgeSettlement judgeSettlement) {
+    }
+    public void onCardJudgeEffected(CardJudgeSettlement judgeSettlement) {
+    }
+
 
     public boolean onDealingDamage(DamageSettlement settlement) {
         return true;
@@ -500,6 +505,8 @@ public class GameEngine {
         //TODO
         return false;
     }
+
+
 
     private static class CsBufferItem {
         private Player owner;
