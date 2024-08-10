@@ -18,10 +18,10 @@ public class InvincibleUseSettlement extends PloyCardSettlement {
     private PloyCardSettlement counterSettlement;
     @Getter
     private boolean success = false;
-    public static InvincibleUseSettlement newOne(CardUseDTO useDTO, PloyCardSettlement counterSettlement) {
+    public static InvincibleUseSettlement newOne(CardUseDTO useDTO) {
         InvincibleUseSettlement settlement = new InvincibleUseSettlement();
         settlement.useDTO = useDTO;
-        settlement.counterSettlement = counterSettlement;
+        settlement.counterSettlement = (PloyCardSettlement) useDTO.getCounterSettlement();
         return settlement;
     }
     @Override

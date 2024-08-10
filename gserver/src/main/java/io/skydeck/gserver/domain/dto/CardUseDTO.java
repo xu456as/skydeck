@@ -2,6 +2,7 @@ package io.skydeck.gserver.domain.dto;
 
 
 import io.skydeck.gserver.domain.CardBase;
+import io.skydeck.gserver.domain.CardSettlement;
 import io.skydeck.gserver.domain.Player;
 import lombok.Data;
 import lombok.Getter;
@@ -25,6 +26,9 @@ public class CardUseDTO {
     @Getter
     @Setter
     private Object extraInfo;
+    @Getter
+    @Setter
+    private CardSettlement counterSettlement;
 
     public CardUseDTO addTarget(Player target) {
         targets.put(target, 1);

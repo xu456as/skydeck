@@ -14,12 +14,12 @@ public class JinkUseSettlement extends CardSettlement {
     @Getter
     private CardUseDTO jinkUseDTO;
     @Getter
-    private CardUseDTO slashUseDTO;
+    private SlashUseSettlement counterSlashUseSettlement;
 
-    public static JinkUseSettlement newOne(CardUseDTO slashUseDTO, CardUseDTO jinkUseDTO) {
+    public static JinkUseSettlement newOne(CardUseDTO jinkUseDTO) {
         JinkUseSettlement settlement = new JinkUseSettlement();
-        settlement.slashUseDTO = slashUseDTO;
         settlement.jinkUseDTO = jinkUseDTO;
+        settlement.counterSlashUseSettlement = (SlashUseSettlement) jinkUseDTO.getCounterSettlement();
         return settlement;
     }
 

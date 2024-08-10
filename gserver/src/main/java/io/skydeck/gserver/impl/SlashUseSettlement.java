@@ -60,7 +60,7 @@ public class SlashUseSettlement extends CardSettlement {
                         if (jinkUse == null) {
                             break;
                         }
-                        JinkUseSettlement jinkSettlement = JinkUseSettlement.newOne(cardUseDTO, jinkUse);
+                        JinkUseSettlement jinkSettlement = JinkUseSettlement.newOne(cardUseDTO);
                         jinkSettlement.resolve(engine);
                         validJink++;
                     }
