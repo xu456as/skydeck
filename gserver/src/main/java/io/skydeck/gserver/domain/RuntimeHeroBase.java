@@ -5,6 +5,7 @@ import io.skydeck.gserver.engine.GameEngine;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,10 +25,14 @@ public abstract class RuntimeHeroBase {
 
     public static RuntimeHeroBase newOne(GameEngine engine, Player player, StaticHeroBase sHero) {
         AbilityFactory abilityFactory = engine.getAbilityFactory();
+        List<AbilityBase> skills = new ArrayList<>();
+        for (String skillName : sHero.skills()) {
+            skills.add(abilityFactory.newSkill(player, skillName));
+        }
         return new RuntimeHeroBase(player, sHero) {
             @Override
             public List<AbilityBase> skills() {
-                return Collections.emptyList();
+                return skills;
             }
         };
     }

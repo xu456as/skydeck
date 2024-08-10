@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class GameEngine {
+    @Resource
     private VisibilityManager visibilityManager;
     @Resource
     private AbilityFactory abilityFactory;
@@ -111,7 +112,7 @@ public class GameEngine {
             case ThrivePloy:
             case LightningPloy:
             case GainStagePloy:
-                return offender == defender && fromGiantKingdom(offender);
+                return offender == defender && inGiantKingdom(offender);
             case StealWeaponPloy:
                 return offender != defender
                         && defender.getEquips().stream().anyMatch(equip -> equip.subType() == CardSubType.Weapon);
@@ -129,6 +130,12 @@ public class GameEngine {
         return false;
     }
 
+    //API
+    public void initPlayers(List<Player> players) {
+        this.players = players;
+        this.currentPlayer = players.get(0);
+    }
+
     public void mainLoop() {
         for (; ; currentPlayer = nextPlayer()) {
             if (!this.preStartCheck()) {
@@ -138,6 +145,7 @@ public class GameEngine {
             this.postYieldCheck();
         }
     }
+    //API
 
     private void resolveStage() {
         activeEnd = false;
@@ -181,10 +189,6 @@ public class GameEngine {
                 log.error("reset stageState error, player:{}", player.getId(), e);
             }
         }
-    }
-
-    public void initPlayers(List<Player> players) {
-        this.players = players;
     }
 
     public void runSettlement(SettlementBase settlement) {
@@ -398,7 +402,7 @@ public class GameEngine {
     }
 
     public void onActivePhase() {
-        System.out.println("active");
+        log.info("player[{}] starts active phase", currentPlayer);
         while (!activeEnd) {
             try {
                 Thread.sleep(1000);
@@ -462,6 +466,7 @@ public class GameEngine {
 
 
     public void endActivePhase() {
+        log.info("player[{}] ends active phase", currentPlayer);
         activeEnd = true;
     }
 
@@ -501,7 +506,7 @@ public class GameEngine {
         }
         return PositionUtil.nextAlivePlayer(currentPlayer, players);
     }
-    public boolean fromGiantKingdom(Player player) {
+    public boolean inGiantKingdom(Player player) {
         //TODO
         return false;
     }

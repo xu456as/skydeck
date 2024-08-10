@@ -19,12 +19,13 @@ public class Player implements Comparable<Player> {
     private String name;
     private int health;
     private int maxHealth;
-    private boolean inDanger = false;
-    private boolean dead = false;
-    private Gender gender = Gender.None;
-    private Kingdom kingdom = Kingdom.Unknown;
     private RuntimeHeroBase primaryHero;
     private RuntimeHeroBase viceHero;
+    private StageState stageState;
+    private Gender gender = Gender.None;
+    private boolean inDanger = false;
+    private boolean dead = false;
+    private Kingdom kingdom = Kingdom.Unknown;
     private int heroMask = 0;
     private List<GearCardBase> equips = new ArrayList<>();
     private List<CardBase> judges = new ArrayList<>();
@@ -35,7 +36,20 @@ public class Player implements Comparable<Player> {
     private List<DynamicAbilityBase> dynamicAbilities = new ArrayList<>();
     private boolean expelled = false;
     private boolean chained = false;
-    private StageState stageState;
+
+    public void init(GameEngine e, int id, String name, StaticHeroBase primaryHero, StaticHeroBase viceHero) {
+        this.id = id;
+        this.name = name;
+        this.health = (int)Math.ceil(
+                        Double.parseDouble(primaryHero.initHealth()) + Double.parseDouble(viceHero.initHealth())
+        );
+        this.maxHealth = (int)Math.ceil(
+                Double.parseDouble(primaryHero.maxHealth()) + Double.parseDouble(viceHero.maxHealth())
+        );
+        this.primaryHero = RuntimeHeroBase.newOne(e, this, primaryHero);
+        this.viceHero = RuntimeHeroBase.newOne(e, this, viceHero);
+        this.stageState = new StageState();
+    }
 
     public void clearResource(GameEngine engine) {
         //TODO clear tokens when dead
@@ -43,6 +57,11 @@ public class Player implements Comparable<Player> {
 
     public Kingdom revealFinalKingdom(GameEngine e) {
         return kingdom;
+    }
+
+    @Override
+    public String toString() {
+        return "%d:%s".formatted(id, name);
     }
 
     @Override
@@ -120,7 +139,7 @@ public class Player implements Comparable<Player> {
     }
 
 
-    private List<AbilityBase> allAbilities() {
+    public List<AbilityBase> allAbilities() {
         List<AbilityBase> abilityList = new ArrayList<>();
         abilityList.addAll(skills);
         abilityList.addAll(abilities);

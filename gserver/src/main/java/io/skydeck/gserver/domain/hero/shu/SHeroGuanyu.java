@@ -14,7 +14,7 @@ public class SHeroGuanyu extends StaticHeroBase {
 
     @Override
     public List<String> skills() {
-        return List.of("WuShen", "HuWei");
+        return List.of("WuSheng", "HuWei");
     }
 
     @Override
