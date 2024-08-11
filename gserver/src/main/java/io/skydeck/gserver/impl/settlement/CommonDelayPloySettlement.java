@@ -27,8 +27,10 @@ public class CommonDelayPloySettlement extends PloyCardSettlement {
         user.removeCard(engine, Collections.singletonList(useDTO.getCard()), CardLostType.Use);
         engine.onCardLost(user, CardLostType.Use, Collections.singletonList(useDTO.getCard()));
         engine.onCardUsing(useDTO, this);
-        engine.onCardTargeting(useDTO, this);
-        engine.onCardTargeted(useDTO, this);
+        engine.onOCardTargeting(useDTO, this);
+        engine.onDCardTargeting(useDTO, this);
+        engine.onOCardTargeted(useDTO, this);
+        engine.onDCardTargeted(useDTO, this);
         Map<Player, Integer> targetMap = useDTO.getTargets();
         Player target = targetMap.keySet().stream().findAny().orElse(null);
         if (target != null) {

@@ -2,6 +2,7 @@ package io.skydeck.gserver.engine;
 
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.DynamicCard;
+import io.skydeck.gserver.domain.card.GearCardBase;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.dto.CardReframeDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
@@ -29,6 +30,8 @@ import java.util.stream.Collectors;
 @Component
 public class GameEngine {
     @Resource
+    private CardSetReader cardSetReader;
+    @Resource
     private VisibilityManager visibilityManager;
     @Resource
     private AbilityFactory abilityFactory;
@@ -44,7 +47,7 @@ public class GameEngine {
     private List<Player> players;
     private volatile boolean activeEnd = false;
     private Phase currentPhase;
-    private SettlementBase currentSettlement;
+    private Stack<SettlementBase> settlementQueue = new Stack<>();
     private Queue<CsBufferItem> csBuffer = new LinkedList<>();
     private Player gainStagePlayer = null;
     private Player roundPlayer = null;
@@ -80,7 +83,7 @@ public class GameEngine {
 
     @SuppressWarnings("DuplicateBranchesInSwitch")
     public boolean canSelectAsCardTarget(Player offender, Player defender, CardBase card) {
-        boolean val = offender.canSelectAsCardTarget(defender, card);
+        boolean val = offender.canSelectAsCardTarget(this, defender, card);
         if (val) {
             return true;
         }
@@ -88,11 +91,11 @@ public class GameEngine {
             case Slash:
                 if (offender == currentPlayer && currentPhase == Phase.ActivePhase) {
                     StageState stageState = offender.getStageState();
-                    if (stageState.getUseSlashCount() >= stageState.getSlashQuota()) {
+                    if (stageState.getUseSlashCount() >= offender.slashQuota()) {
                         return false;
                     }
                 }
-                return offender.attackRange() >= distance(offender, defender);
+                return offender.attackRange() >= distance(offender, defender) || offender.ignoreDistance(defender, card);
             case Cure:
                 return offender == defender || defender.getHealth() <= 0;
             case Liquor:
@@ -105,13 +108,13 @@ public class GameEngine {
                 return offender == defender;
             case DuelPloy:
             case DismantlePloy:
-            case StealPloy:
             case EnhancedDismantlePloy:
             case SendLimboPloy:
             case SkipActivePloy:
                 return offender != defender;
+            case StealPloy:
             case SkipDrawPloy:
-                return offender != defender && distance(offender, defender) <= 1;
+                return offender != defender && distance(offender, defender) <= 1 || offender.ignoreDistance(defender, card);
             case ThrivePloy:
             case LightningPloy:
             case GainStagePloy:
@@ -195,8 +198,16 @@ public class GameEngine {
     }
 
     public void runSettlement(SettlementBase settlement) {
+        settlementQueue.push(settlement);
         settlement.resolve(this);
+        settlementQueue.pop();
         purgeCsBuffer();
+    }
+    public SettlementBase currentSettlement() {
+        if (settlementQueue.isEmpty()) {
+            return null;
+        }
+        return settlementQueue.peek();
     }
 
     public void addToCsBuffer(Player player, List<CardBase> cards, CardLostType type) {
@@ -252,10 +263,17 @@ public class GameEngine {
         }
     }
 
-    public void onCardTargeting(CardUseDTO dto, CardSettlement settlement) {
+
+    public void onOCardTargeting(CardUseDTO dto, CardSettlement settlement) {
     }
 
-    public void onCardTargeted(CardUseDTO dto, CardSettlement settlement) {
+    public void onDCardTargeting(CardUseDTO dto, CardSettlement settlement) {
+    }
+
+    public void onOCardTargeted(CardUseDTO dto, CardSettlement settlement) {
+    }
+
+    public void onDCardTargeted(CardUseDTO dto, CardSettlement settlement) {
     }
 
     public boolean onCardEffecting(CardUseDTO dto, CardSettlement settlement, Player target) {
@@ -299,6 +317,13 @@ public class GameEngine {
         if (CollectionUtils.isNotEmpty(cards)) {
             player.incStageCount("lostCardCount", cards.size());
         }
+    }
+    public boolean onCardEquipping(Player player, GearEquipType type, List<GearCardBase> cards) {
+        //todo
+        return true;
+    }
+    public void onCardEquipped(Player player, GearEquipType type, List<GearCardBase> cards) {
+        //todo
     }
     public void onCardJudgeEffecting(CardJudgeSettlement judgeSettlement) {
     }

@@ -7,5 +7,6 @@ public enum CardAcquireWay {
     Steal,
     HandOver,
     Move,
+    EquipOn,
     Other
 }

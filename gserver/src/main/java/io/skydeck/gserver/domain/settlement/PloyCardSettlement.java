@@ -15,16 +15,16 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 public abstract class PloyCardSettlement extends CardSettlement {
-    @Getter
-    protected CardUseDTO useDTO;
 
-    public void commonResolve(GameEngine e, BiConsumer<GameEngine, Player> func) {
+    protected void commonResolve(GameEngine e, BiConsumer<GameEngine, Player> func) {
         Player user = useDTO.getPlayer();
         user.removeCard(e, Collections.singletonList(useDTO.getCard()), CardLostType.Use);
         e.onCardLost(user, CardLostType.Use, Collections.singletonList(useDTO.getCard()));
         e.onCardUsing(useDTO, this);
-        e.onCardTargeting(useDTO, this);
-        e.onCardTargeted(useDTO, this);
+        e.onOCardTargeting(useDTO, this);
+        e.onDCardTargeting(useDTO, this);
+        e.onOCardTargeted(useDTO, this);
+        e.onDCardTargeted(useDTO, this);
         Map<Player, Integer> targetMap = useDTO.getTargets();
         if (!MapUtils.isEmpty(targetMap)) {
             List<Player> sortedList = PositionUtil.positionSort(e.getCurrentPlayer(), targetMap.keySet());

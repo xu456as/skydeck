@@ -2,8 +2,11 @@ package io.skydeck.gserver.domain.skill;
 
 import io.skydeck.gserver.annotation.I18n;
 import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
 import io.skydeck.gserver.domain.player.Player;
+import io.skydeck.gserver.domain.settlement.CardSettlement;
+import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.AbilityTag;
 import io.skydeck.gserver.impl.settlement.DamageSettlement;
@@ -20,7 +23,7 @@ public abstract class AbilityBase {
     public Set<Enum> events() {
         return Collections.emptySet();
     }
-    public boolean canActive(GameEngine engine, Enum event, Player player) {return false;}
+    public boolean canActive(GameEngine e, Enum event, Player player) {return false;}
 
     public String name() {
         return nameI18n(null);
@@ -41,10 +44,14 @@ public abstract class AbilityBase {
     public void onCardUsing() {
     }
 
-    public void onCardTargeting() {
+    public void onOCardTargeting(Player offender, Player defender, CardSettlement settlementBase) {
+    }
+    public void onDCardTargeting(Player offender, Player defender, CardSettlement settlementBase) {
     }
 
-    public void onCardTargeted() {
+    public void onOCardTargeted(Player offender, Player defender, CardSettlement settlementBase) {
+    }
+    public void onDCardTargeted(Player offender, Player defender, CardSettlement settlementBase) {
     }
 
     public void onCardEffecting() {
@@ -88,7 +95,12 @@ public abstract class AbilityBase {
     public void onAlcoholLimitCheck() {
     }
 
-    public void onSlashLimitCheck() {
+    public int slashQuotaMod(int original) {
+        return original;
+    }
+
+    public boolean ignoreDistance(Player target, CardBase card) {
+        return false;
     }
 
     public void onSlashNumberCheck() {
@@ -179,7 +191,7 @@ public abstract class AbilityBase {
 
     }
 
-    public boolean canSelectAsCardTarget(Player player, Player target, CardBase card) {
+    public boolean canSelectAsCardTarget(GameEngine e, Player player, Player target, CardBase card) {
         return false;
     }
 

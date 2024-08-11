@@ -19,6 +19,8 @@ public class SlashUseSettlement extends CardSettlement {
     private CardUseDTO cardUseDTO;
     private Map<Player, Integer> damageCountMap = new HashMap<>();
     private Map<Player, Integer> jinkQueryCountMap = new HashMap<>();
+    @Getter
+    private Set<Player> ignoreArmorSet = new HashSet<>();
 
     private Set<Player> jinkSuccessSet = new HashSet<>();
 
@@ -40,8 +42,10 @@ public class SlashUseSettlement extends CardSettlement {
         user.removeCard(engine, Collections.singletonList(cardUseDTO.getCard()), CardLostType.Use);
         engine.onCardLost(user, CardLostType.Use, Collections.singletonList(cardUseDTO.getCard()));
         engine.onCardUsing(cardUseDTO, this);
-        engine.onCardTargeting(cardUseDTO, this);
-        engine.onCardTargeted(cardUseDTO, this);
+        engine.onOCardTargeting(cardUseDTO, this);
+        engine.onDCardTargeting(cardUseDTO, this);
+        engine.onOCardTargeted(cardUseDTO, this);
+        engine.onDCardTargeted(cardUseDTO, this);
         Map<Player, Integer> targetMap = cardUseDTO.getTargets();
         if (!MapUtils.isEmpty(targetMap)) {
             List<Player> sortedList = PositionUtil.positionSort(engine.getCurrentPlayer(), targetMap.keySet());

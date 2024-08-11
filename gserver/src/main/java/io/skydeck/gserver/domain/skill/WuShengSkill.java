@@ -65,7 +65,7 @@ public class WuShengSkill extends SkillBase {
     }
 
     @Override
-    public boolean canSelectAsCardTarget(Player player, Player target, CardBase card) {
-        return card.subType() == CardSubType.Slash && card.suit() == Suit.Diamond && target != player;
+    public boolean ignoreDistance(Player target, CardBase card) {
+        return card.subType() == CardSubType.Slash && card.suit() == Suit.Diamond;
     }
 }

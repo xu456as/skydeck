@@ -14,5 +14,8 @@ public class CardTransferContext {
     public static CardTransferContext draw() {
         return CardTransferContext.builder().acquireWay(CardAcquireWay.Draw).build();
     }
+    public static CardTransferContext equipOn() {
+        return CardTransferContext.builder().acquireWay(CardAcquireWay.EquipOn).build();
+    }
 
 }

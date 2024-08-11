@@ -6,6 +6,7 @@ public enum CardLostType {
     Use,
     Judge,
     EquipOff,
+    EquipReplaced,
     Reframe,
     Other,
     Stolen,

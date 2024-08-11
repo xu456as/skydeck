@@ -19,6 +19,7 @@ import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -98,8 +99,8 @@ public class Player implements Comparable<Player> {
     public void onPostYield(GameEngine gameEngine) {
     }
 
-    public boolean canSelectAsCardTarget(Player target, CardBase card) {
-        return getSkills().stream().anyMatch(skill -> skill.canSelectAsCardTarget(this, target, card));
+    public boolean canSelectAsCardTarget(GameEngine e, Player target, CardBase card) {
+        return getSkills().stream().anyMatch(skill -> skill.canSelectAsCardTarget(e, this, target, card));
     }
 
     public int attackRange() {
@@ -111,6 +112,14 @@ public class Player implements Comparable<Player> {
                 .map(GearCardBase::attackRange)
                 .max(Integer::compareTo)
                 .orElse(1);
+    }
+    public int slashQuota() {
+        List<AbilityBase> abs = allAbilities();
+        int val = stageState.getSlashQuota();
+        for (AbilityBase ab : abs) {
+            val = ab.slashQuotaMod(val);
+        }
+        return val;
     }
 
     public int offensePoint() {
@@ -179,6 +188,10 @@ public class Player implements Comparable<Player> {
     public void acquireHand(GameEngine e, CardTransferContext ctc, List<CardBase> cards) {
         //TODO add alarm
         hands.addAll(cards);
+    }
+    public void acquireEquip(GameEngine e, CardTransferContext ctc, List<GearCardBase> cards) {
+        //TODO add alarm
+        equips.addAll(cards);
     }
     public void updateHeroActive(int index, boolean active) {
         switch (index) {
@@ -254,5 +267,9 @@ public class Player implements Comparable<Player> {
         } catch (Exception e) {
             throw new BizException("can't increment stage count for key[%s]".formatted(key), e);
         }
+    }
+
+    public boolean ignoreDistance(Player defender, CardBase card) {
+        return allAbilities().stream().anyMatch(ab -> ab.ignoreDistance(defender, card));
     }
 }
