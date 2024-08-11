@@ -1,8 +1,8 @@
 package io.skydeck.gserver.engine;
 
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.Player;
-import io.skydeck.gserver.domain.StaticHeroBase;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.player.Player;
+import io.skydeck.gserver.domain.hero.StaticHeroBase;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

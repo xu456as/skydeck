@@ -1,10 +1,9 @@
 package io.skydeck.gserver.domain.skill;
 
 import io.skydeck.gserver.annotation.AbilityName;
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.DynamicCard;
-import io.skydeck.gserver.domain.Player;
-import io.skydeck.gserver.domain.SkillBase;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.card.DynamicCard;
+import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
@@ -14,8 +13,8 @@ import io.skydeck.gserver.enums.CardNameType;
 import io.skydeck.gserver.enums.CardSubType;
 import io.skydeck.gserver.enums.Color;
 import io.skydeck.gserver.enums.Suit;
-import io.skydeck.gserver.impl.CardSacrificeSettlement;
-import io.skydeck.gserver.impl.SlashUseSettlement;
+import io.skydeck.gserver.impl.settlement.CardSacrificeSettlement;
+import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;

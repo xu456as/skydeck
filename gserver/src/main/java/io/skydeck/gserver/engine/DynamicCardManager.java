@@ -1,8 +1,7 @@
 package io.skydeck.gserver.engine;
 
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.DynamicCard;
-import io.skydeck.gserver.domain.GearCardBase;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.card.DynamicCard;
 import io.skydeck.gserver.enums.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;

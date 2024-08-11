@@ -1,9 +1,9 @@
 package io.skydeck.gserver.engine;
 
-import io.skydeck.gserver.domain.AbilityBase;
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.CardFilterIface;
-import io.skydeck.gserver.domain.Player;
+import io.skydeck.gserver.domain.skill.AbilityBase;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.card.CardFilterIface;
+import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;

@@ -1,6 +1,6 @@
 package io.skydeck.gserver.util;
 
-import io.skydeck.gserver.domain.Player;
+import io.skydeck.gserver.domain.player.Player;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;

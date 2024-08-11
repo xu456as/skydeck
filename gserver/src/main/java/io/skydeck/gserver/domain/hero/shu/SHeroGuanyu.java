@@ -1,6 +1,6 @@
 package io.skydeck.gserver.domain.hero.shu;
 
-import io.skydeck.gserver.domain.StaticHeroBase;
+import io.skydeck.gserver.domain.hero.StaticHeroBase;
 import io.skydeck.gserver.enums.Gender;
 import io.skydeck.gserver.enums.Kingdom;
 

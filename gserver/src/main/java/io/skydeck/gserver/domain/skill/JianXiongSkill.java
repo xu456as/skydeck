@@ -1,17 +1,15 @@
 package io.skydeck.gserver.domain.skill;
 
 import io.skydeck.gserver.annotation.AbilityName;
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.DynamicCard;
-import io.skydeck.gserver.domain.Player;
-import io.skydeck.gserver.domain.SkillBase;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.CardAcquireWay;
 import io.skydeck.gserver.enums.DamageEvent;
 import io.skydeck.gserver.i18n.TextDictionary;
-import io.skydeck.gserver.impl.DamageSettlement;
+import io.skydeck.gserver.impl.settlement.DamageSettlement;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;

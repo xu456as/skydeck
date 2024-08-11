@@ -1,10 +1,9 @@
 package io.skydeck.gserver.domain.dto;
 
 
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.CardSettlement;
-import io.skydeck.gserver.domain.Player;
-import lombok.Data;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.settlement.CardSettlement;
+import io.skydeck.gserver.domain.player.Player;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;

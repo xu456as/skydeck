@@ -1,7 +1,7 @@
 package io.skydeck.gserver.impl;
 
 import io.skydeck.gserver.GserverApplicationTests;
-import io.skydeck.gserver.domain.Player;
+import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.hero.shu.SHeroGuanyu;
 import io.skydeck.gserver.engine.GameEngine;
 import jakarta.annotation.Resource;

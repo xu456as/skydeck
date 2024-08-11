@@ -1,12 +1,16 @@
 package io.skydeck.gserver.domain.card.gear;
 
-import io.skydeck.gserver.domain.*;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.card.CardFilterIface;
+import io.skydeck.gserver.domain.card.GearCardBase;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
+import io.skydeck.gserver.domain.player.Player;
+import io.skydeck.gserver.domain.skill.AbilityBase;
 import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.*;
-import io.skydeck.gserver.impl.SlashUseSettlement;
+import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 
 import java.util.Collections;
 import java.util.List;

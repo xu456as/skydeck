@@ -4,9 +4,9 @@ import lombok.Getter;
 
 public enum CardNameType {
     Slash(CardType.Basic, CardSubType.Slash, "slash"),
-    FireSlash(CardType.Basic, CardSubType.Slash, "fireSlash"),
-    ThunderSlash(CardType.Basic, CardSubType.Slash, "thunderSlash"),
-    IceSlash(CardType.Basic, CardSubType.Slash, "slash"),
+//    FireSlash(CardType.Basic, CardSubType.Slash, "fireSlash"),
+//    ThunderSlash(CardType.Basic, CardSubType.Slash, "thunderSlash"),
+//    IceSlash(CardType.Basic, CardSubType.Slash, "slash"),
     Cure(CardType.Basic, CardSubType.Cure, "cure"),
     Jink(CardType.Basic, CardSubType.Jink, "jink"),
     Liquor(CardType.Basic, CardSubType.Liquor, "liquor"),

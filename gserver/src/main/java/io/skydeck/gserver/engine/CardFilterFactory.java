@@ -1,7 +1,7 @@
 package io.skydeck.gserver.engine;
 
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.CardFilterIface;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.card.CardFilterIface;
 import io.skydeck.gserver.enums.CardSubType;
 import io.skydeck.gserver.enums.CardType;
 import io.skydeck.gserver.enums.Suit;

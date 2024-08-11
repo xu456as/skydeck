@@ -1,8 +1,8 @@
 package io.skydeck.gserver.engine;
 
 import io.skydeck.gserver.annotation.AbilityName;
-import io.skydeck.gserver.domain.AbilityBase;
-import io.skydeck.gserver.domain.Player;
+import io.skydeck.gserver.domain.skill.AbilityBase;
+import io.skydeck.gserver.domain.player.Player;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ResourceLoaderAware;

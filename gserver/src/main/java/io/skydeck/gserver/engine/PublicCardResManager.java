@@ -1,7 +1,7 @@
 package io.skydeck.gserver.engine;
 
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.DynamicCard;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.card.DynamicCard;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.rng.core.source32.JDKRandom;
 import org.springframework.stereotype.Component;

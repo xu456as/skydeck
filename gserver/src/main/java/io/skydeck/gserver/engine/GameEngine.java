@@ -1,12 +1,18 @@
 package io.skydeck.gserver.engine;
 
-import io.skydeck.gserver.domain.*;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.card.DynamicCard;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.dto.CardReframeDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
+import io.skydeck.gserver.domain.player.Player;
+import io.skydeck.gserver.domain.player.StageState;
+import io.skydeck.gserver.domain.settlement.CardSettlement;
+import io.skydeck.gserver.domain.settlement.SettlementBase;
+import io.skydeck.gserver.domain.skill.AbilityBase;
 import io.skydeck.gserver.enums.*;
-import io.skydeck.gserver.impl.*;
+import io.skydeck.gserver.impl.settlement.*;
 import io.skydeck.gserver.util.PositionUtil;
 import jakarta.annotation.Resource;
 import lombok.Data;
@@ -80,9 +86,6 @@ public class GameEngine {
         }
         switch (card.nameType()) {
             case Slash:
-            case FireSlash:
-            case IceSlash:
-            case ThunderSlash:
                 if (offender == currentPlayer && currentPhase == Phase.ActivePhase) {
                     StageState stageState = offender.getStageState();
                     if (stageState.getUseSlashCount() >= stageState.getSlashQuota()) {

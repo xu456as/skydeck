@@ -1,7 +1,5 @@
 package io.skydeck.gserver.domain.card;
 
-import io.skydeck.gserver.domain.CardProperties;
-import io.skydeck.gserver.domain.card.basic.CardSlash;
 import io.skydeck.gserver.enums.*;
 
 import java.util.regex.Pattern;

@@ -1,7 +1,7 @@
 package io.skydeck.gserver.domain.dto;
 
-import io.skydeck.gserver.domain.CardBase;
-import io.skydeck.gserver.domain.Player;
+import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.player.Player;
 import lombok.Builder;
 import lombok.Data;
 
