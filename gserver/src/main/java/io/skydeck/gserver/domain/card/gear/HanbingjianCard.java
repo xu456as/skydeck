@@ -10,10 +10,7 @@ import io.skydeck.gserver.domain.skill.AbilityBase;
 import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
-import io.skydeck.gserver.enums.CardNameType;
-import io.skydeck.gserver.enums.CardSubType;
-import io.skydeck.gserver.enums.DamageEvent;
-import io.skydeck.gserver.enums.Phase;
+import io.skydeck.gserver.enums.*;
 import io.skydeck.gserver.i18n.TextDictionary;
 import io.skydeck.gserver.impl.settlement.CardDiscardSettlement;
 import io.skydeck.gserver.impl.settlement.DamageSettlement;
@@ -21,6 +18,7 @@ import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @CardExecMeta(cardNameType = CardNameType.Hanbingjian, settlement = "GearCardSettlement")
 public class HanbingjianCard extends GearCardBase {
@@ -41,6 +39,10 @@ public class HanbingjianCard extends GearCardBase {
         @Override
         public String name() {
             return HanbingjianCard.this.name();
+        }
+        @Override
+        public Set<Enum> events() {
+            return Collections.singleton(DamageEvent.ODamaging);
         }
         @Override
         public boolean canActive(GameEngine engine, Enum event, Player player) {

@@ -8,18 +8,24 @@ import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardSubType;
 import io.skydeck.gserver.util.PositionUtil;
+import lombok.Getter;
 
 import java.util.Collections;
 import java.util.List;
 
 public class InDangerSettlement extends SettlementBase {
+    @Getter
     private Player player;
+    @Getter
     private Player dealer;
+    @Getter
+    private DamageSettlement damageSettlement;
 
-    public static InDangerSettlement newOne(Player player, Player dealer) {
+    public static InDangerSettlement newOne(Player player, Player dealer, DamageSettlement damageSettlement) {
         InDangerSettlement settlement = new InDangerSettlement();
         settlement.player = player;
         settlement.dealer = dealer;
+        settlement.damageSettlement = damageSettlement;
         return settlement;
     }
 
@@ -60,7 +66,7 @@ public class InDangerSettlement extends SettlementBase {
             player.setInDanger(false);
             engine.onRecover(this);
         } else {
-            DyingSettlement dyingSettlement = DyingSettlement.newOne(player, dealer);
+            DeceaseSettlement dyingSettlement = DeceaseSettlement.newOne(player, dealer);
             dyingSettlement.resolve(engine);
         }
 

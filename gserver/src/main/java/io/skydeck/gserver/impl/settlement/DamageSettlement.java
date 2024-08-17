@@ -33,7 +33,7 @@ public class DamageSettlement extends SettlementBase {
         }
         sufferer.updateHealth(engine, -damageCount);
         if (sufferer.getHealth() <= 0) {
-            InDangerSettlement inDangerSettlement = InDangerSettlement.newOne(sufferer, dealer);
+            InDangerSettlement inDangerSettlement = InDangerSettlement.newOne(sufferer, dealer, this);
             inDangerSettlement.resolve(engine);
         }
         engine.onDealtDamage(this);

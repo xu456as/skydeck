@@ -12,12 +12,12 @@ import io.skydeck.gserver.enums.Kingdom;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DyingSettlement extends SettlementBase {
+public class DeceaseSettlement extends SettlementBase {
     private Player deceased;
     private Player killer;
 
-    public static DyingSettlement newOne(Player deceased, Player killer) {
-        DyingSettlement settlement = new DyingSettlement();
+    public static DeceaseSettlement newOne(Player deceased, Player killer) {
+        DeceaseSettlement settlement = new DeceaseSettlement();
         settlement.deceased = deceased;
         settlement.killer = killer;
         return settlement;

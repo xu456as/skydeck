@@ -15,8 +15,6 @@ import org.apache.commons.collections4.MapUtils;
 import java.util.*;
 
 public class SlashUseSettlement extends CardSettlement {
-    @Getter
-    private CardUseDTO cardUseDTO;
     private Map<Player, Integer> damageCountMap = new HashMap<>();
     private Map<Player, Integer> jinkQueryCountMap = new HashMap<>();
     @Getter
@@ -26,7 +24,7 @@ public class SlashUseSettlement extends CardSettlement {
 
     public static SlashUseSettlement newOne(CardUseDTO useDTO) {
         SlashUseSettlement settlement = new SlashUseSettlement();
-        settlement.cardUseDTO =  useDTO;
+        settlement.useDTO = useDTO;
         return settlement;
     }
 
@@ -38,21 +36,21 @@ public class SlashUseSettlement extends CardSettlement {
         QueryManager queryManager = engine.getQueryManager();
         CardFilterFactory cff = engine.getCardFilterFactory();
 
-        Player user = cardUseDTO.getPlayer();
-        user.removeCard(engine, Collections.singletonList(cardUseDTO.getCard()), CardLostType.Use);
-        engine.onCardLost(user, CardLostType.Use, Collections.singletonList(cardUseDTO.getCard()));
-        engine.onCardUsing(cardUseDTO, this);
-        engine.onOCardTargeting(cardUseDTO, this);
-        engine.onDCardTargeting(cardUseDTO, this);
-        engine.onOCardTargeted(cardUseDTO, this);
-        engine.onDCardTargeted(cardUseDTO, this);
-        Map<Player, Integer> targetMap = cardUseDTO.getTargets();
+        Player user = useDTO.getPlayer();
+        user.removeCard(engine, Collections.singletonList(useDTO.getCard()), CardLostType.Use);
+        engine.onCardLost(user, CardLostType.Use, Collections.singletonList(useDTO.getCard()));
+        engine.onCardUsing(useDTO, this);
+        engine.onOCardTargeting(useDTO, this);
+        engine.onDCardTargeting(useDTO, this);
+        engine.onOCardTargeted(useDTO, this);
+        engine.onDCardTargeted(useDTO, this);
+        Map<Player, Integer> targetMap = useDTO.getTargets();
         if (!MapUtils.isEmpty(targetMap)) {
             List<Player> sortedList = PositionUtil.positionSort(engine.getCurrentPlayer(), targetMap.keySet());
             for (Player target : sortedList) {
                 int effectCnt = targetMap.get(target);
                 for (int i = 0; i < effectCnt; i++) {
-                    boolean valid = engine.onCardEffecting(cardUseDTO, this, target);
+                    boolean valid = engine.onCardEffecting(useDTO, this, target);
                     if (!valid || target.isDead()) {
                         continue;
                     }
@@ -64,7 +62,7 @@ public class SlashUseSettlement extends CardSettlement {
                         if (jinkUse == null) {
                             break;
                         }
-                        JinkUseSettlement jinkSettlement = JinkUseSettlement.newOne(cardUseDTO);
+                        JinkUseSettlement jinkSettlement = JinkUseSettlement.newOne(useDTO);
                         jinkSettlement.resolve(engine);
                         validJink++;
                     }
@@ -76,20 +74,20 @@ public class SlashUseSettlement extends CardSettlement {
                             causeDamage(engine, target);
                         }
                     }
-                    engine.onCardEffected(cardUseDTO, this, target);
+                    engine.onCardEffected(useDTO, this, target);
                 }
             }
         }
-        cardUseDTO.getPlayer().getStageState().setDrunk(false);
-        engine.onCardEffectFinish(cardUseDTO, this);
-        engine.onCardUsed(cardUseDTO, this);
+        useDTO.getPlayer().getStageState().setDrunk(false);
+        engine.onCardEffectFinish(useDTO, this);
+        engine.onCardUsed(useDTO, this);
     }
 
     private void causeDamage(GameEngine engine, Player target) {
-        int drunkDamage = (cardUseDTO.getPlayer().getStageState().getDrunk()) ? 1 : 0;
-        DamageSettlement damageSettlement = DamageSettlement.newOne(cardUseDTO.getPlayer(),
+        int drunkDamage = (useDTO.getPlayer().getStageState().getDrunk()) ? 1 : 0;
+        DamageSettlement damageSettlement = DamageSettlement.newOne(useDTO.getPlayer(),
                 target, damageCountMap.getOrDefault(target, 1) + drunkDamage,
-                cardUseDTO.getCard().nature(), cardUseDTO.getCard());
+                useDTO.getCard().nature(), useDTO.getCard());
         damageSettlement.resolve(engine);
     }
 

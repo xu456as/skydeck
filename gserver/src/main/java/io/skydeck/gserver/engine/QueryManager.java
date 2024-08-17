@@ -29,6 +29,7 @@ public class QueryManager {
     public CardUseDTO cardUseQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
     public CardSacrificeDTO cardSacrificeQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
     public CardDiscardDTO cardDiscardQuery(Player player, int count, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
+    public CardDiscardDTO cardDiscardQuery(Player player, int count, int allowArea) {return null;}
     public CardDiscardDTO handCardDiscardQuery(Player player, int count, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
 
     public CardBase pickOneCard(Player offender, Player defender, int allowArea) {

@@ -180,9 +180,9 @@ public class Player implements Comparable<Player> {
 
     public void onLeavingDiscardPhase(GameEngine e, Player currentPlayer) {
         List<AbilityBase> abilities = allAbilities().stream()
-                .filter(ab -> ab.canActive(e, PhaseEvent.LeavingDiscardPhase, currentPlayer))
+                .filter(ab -> ab.canActive(e, PhaseEvent.LeavingDiscardPhase, this))
                 .toList();
-        e.batchQueryAbility(this, abilities, (ability) -> ability.onLeavingDiscardPhase(e, currentPlayer));
+        e.batchQueryAbility(this, abilities, (ability) -> ability.onLeavingDiscardPhase(e, this));
     }
 
     public void acquireHand(GameEngine e, CardTransferContext ctc, List<CardBase> cards) {

@@ -389,7 +389,7 @@ public class GameEngine {
     public void onRecover(InDangerSettlement settlement) {
     }
 
-    public void onDying(DyingSettlement settlement) {
+    public void onDying(DeceaseSettlement settlement) {
     }
 
     public void onStart() {

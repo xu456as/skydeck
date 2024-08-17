@@ -1,19 +1,14 @@
 package io.skydeck.gserver.domain.card.gear;
 
 import io.skydeck.gserver.annotation.CardExecMeta;
-import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.GearCardBase;
-import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.domain.skill.AbilityBase;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardNameType;
-import io.skydeck.gserver.enums.CardSubType;
 import io.skydeck.gserver.enums.CardUseEvent;
-import io.skydeck.gserver.enums.DamageEvent;
-import io.skydeck.gserver.impl.settlement.DamageSettlement;
 import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 
 import java.util.Collections;
@@ -40,13 +35,26 @@ public class QinggangjianCard extends GearCardBase {
         }
         @Override
         public boolean canActive(GameEngine engine, Enum event, Player player) {
-            //TODO
-            return false;
+            SettlementBase currentSettlement = engine.currentSettlement();
+            if (!(currentSettlement instanceof SlashUseSettlement slashUseSettlement)) {
+                return false;
+            }
+            if (player != slashUseSettlement.getUseDTO().getPlayer()) {
+                return false;
+            }
+            return event == CardUseEvent.OTargeted && player.getEquips().contains(QinggangjianCard.this);
+        }
+        @Override
+        public boolean mandatory() {
+            return true;
         }
 
         @Override
-        public void onOCardTargeted(Player offender, Player defender, CardSettlement settlement) {
-            //TODO
+        public void onOCardTargeted(GameEngine e, Player offender, Player defender, CardSettlement settlement) {
+            if (!(settlement instanceof SlashUseSettlement slashUseSettlement)) {
+                return;
+            }
+            slashUseSettlement.getIgnoreArmorSet().add(defender);
         }
     }
 }
