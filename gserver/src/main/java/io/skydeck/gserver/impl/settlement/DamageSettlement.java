@@ -28,7 +28,7 @@ public class DamageSettlement extends SettlementBase {
     @Override
     public void resolve(GameEngine engine) {
         boolean valid = engine.onDealingDamage(this);
-        if (!valid || damageCount == 0) {
+        if (!valid || damageCount <= 0) {
             return;
         }
         sufferer.updateHealth(engine, -damageCount);

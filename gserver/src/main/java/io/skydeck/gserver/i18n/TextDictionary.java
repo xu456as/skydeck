@@ -20,7 +20,11 @@ public enum TextDictionary {
     ExposePrimaryHero,
     ExposeViceHero,
     Steal,
-    Dismantle
+    Dismantle,
+
+    ZhuqueyushanOpt0,//fire
+    ZhuqueyushanOpt1,//thunder
+    ZhuqueyushanOpt2,//ice
     ;
 
 

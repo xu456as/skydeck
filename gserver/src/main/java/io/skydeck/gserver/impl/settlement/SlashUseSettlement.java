@@ -7,6 +7,7 @@ import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.CardLostType;
+import io.skydeck.gserver.enums.DamageNature;
 import io.skydeck.gserver.util.PositionUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,10 +24,12 @@ public class SlashUseSettlement extends CardSettlement {
     private Set<Player> disableHeroRevealingSet = new HashSet<>();
 
     private Set<Player> jinkSuccessSet = new HashSet<>();
+    private DamageNature damageNature;
 
     public static SlashUseSettlement newOne(CardUseDTO useDTO) {
         SlashUseSettlement settlement = new SlashUseSettlement();
         settlement.useDTO = useDTO;
+        settlement.damageNature = useDTO.getCard().nature();
         return settlement;
     }
 
@@ -109,5 +112,9 @@ public class SlashUseSettlement extends CardSettlement {
         } else {
             damageCountMap.put(target, count);
         }
+    }
+
+    public void updateNature(DamageNature damageNature) {
+        this.damageNature = damageNature;
     }
 }

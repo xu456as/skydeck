@@ -44,7 +44,7 @@ public abstract class AbilityBase {
         return "";
     }
 
-    public void onCardUsing() {
+    public void onCardUsing(GameEngine e, Player offender, CardSettlement settlement) {
     }
 
     public void onOCardTargeting(GameEngine e, Player offender, Player defender, CardSettlement settlementBase) {
