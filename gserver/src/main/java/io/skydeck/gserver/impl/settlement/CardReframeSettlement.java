@@ -5,6 +5,7 @@ import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.dto.CardReframeDTO;
 import io.skydeck.gserver.domain.dto.CardTransferContext;
+import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardAcquireWay;
 import io.skydeck.gserver.enums.CardLostType;
@@ -12,7 +13,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-public class CardReframeSettlement extends CardSettlement {
+public class CardReframeSettlement extends SettlementBase {
 
     @Getter
     private CardReframeDTO reframeDTO;

@@ -4,6 +4,7 @@ import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.GearCardBase;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
+import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
@@ -73,7 +74,11 @@ public class FeilongduofengCard extends GearCardBase {
             if (dSettlement.getCard() == null || dSettlement.getCard().subType() != CardSubType.Slash) {
                 return false;
             }
-            return event == InDangerEvent.InDangering && player.getEquips().contains(FeilongduofengCard.this);
+            Player dealer = null;
+            if ((dealer = dSettlement.getDealer()) == null) {
+                return false;
+            }
+            return event == InDangerEvent.InDangering && dealer.getEquips().contains(FeilongduofengCard.this);
         }
 
         @Override
@@ -87,5 +92,23 @@ public class FeilongduofengCard extends GearCardBase {
                 e.runSettlement(CardDiscardSettlement.newOne(discardDTO));
             }
         }
+
+        @Override
+        public void onInDangering(GameEngine e, InDangerSettlement settlement) {
+            Player suffer = settlement.getPlayer();
+            QueryManager qm = e.getQueryManager();
+            CardBase card = qm.pickOneCard(owner, suffer, QueryManager.AREA_OWN);
+            if (card == null) {
+                return;
+            }
+            List<CardBase> cardMove = Collections.singletonList(card);
+            cardMove = e.onCardLosing(suffer, CardLostType.Stolen, cardMove);
+            suffer.removeCard(e, cardMove, CardLostType.Stolen);
+            e.onCardLost(suffer, CardLostType.Stolen, cardMove);
+            owner.acquireHand(e,
+                    CardTransferContext.builder().acquireWay(CardAcquireWay.Steal).build(),
+                    cardMove);
+        }
+
     }
 }

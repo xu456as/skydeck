@@ -26,4 +26,8 @@ public abstract class GearCardBase extends CardBase {
     public void onLeavingGearArea(GameEngine engine, Player player) {}
     public void onBurying(GameEngine engine, Player player) {}
 
+    public void updateOwner(Player owner) {
+        abilities().forEach(ab -> ab.setOwner(owner));
+    }
+
 }

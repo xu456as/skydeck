@@ -1,1 +1,2 @@
-reframe ability method parameters
+reframe ability method parameters #done
+implement slash logic with new data

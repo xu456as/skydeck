@@ -8,6 +8,7 @@ import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.AbilityTag;
 import io.skydeck.gserver.impl.settlement.DamageSettlement;
+import io.skydeck.gserver.impl.settlement.InDangerSettlement;
 import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 
 import java.util.Collections;
@@ -16,6 +17,9 @@ import java.util.Set;
 
 public abstract class AbilityBase {
 
+    protected Player owner = null;
+    public Player owner() {return owner;}
+    public void setOwner(Player owner) {this.owner = owner;}
     public Set<AbilityTag> tags() {return Collections.emptySet();}
 
     public Set<Enum> events() {
@@ -81,7 +85,7 @@ public abstract class AbilityBase {
     }
     public void onDDamaging(GameEngine engine, DamageSettlement settlement) {
     }
-    public void onODamage(GameEngine engine, DamageSettlement settlement) {
+    public void onODamaged(GameEngine engine, DamageSettlement settlement) {
     }
 
 
@@ -187,6 +191,9 @@ public abstract class AbilityBase {
 
     }
     public void proactiveAction(GameEngine engine, Player player, ProactiveActionDTO proactiveActionDTO) {
+
+    }
+    public void onInDangering(GameEngine e, InDangerSettlement settlement) {
 
     }
 

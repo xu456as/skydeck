@@ -14,6 +14,7 @@ import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.*;
 import io.skydeck.gserver.exception.BizException;
 import io.skydeck.gserver.impl.settlement.DamageSettlement;
+import io.skydeck.gserver.impl.settlement.InDangerSettlement;
 import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -145,7 +146,7 @@ public class Player implements Comparable<Player> {
 
     public void onJinkSucceed(GameEngine engine, SlashUseSettlement settlement, Player offender, Player defender) {
         List<AbilityBase> abilities = allAbilities().stream()
-                .filter(abilityBase -> abilityBase.canActive(engine, DuckEvent.JinkUseDuck, this))
+                .filter(abilityBase -> abilityBase.canActive(engine, DuckEvent.JinkUseDuck, defender))
                 .collect(Collectors.toList());
         engine.batchQueryAbility(this, abilities,
                 (ability) -> ability.onJinkSucceed(engine, settlement, offender, defender)
@@ -171,16 +172,23 @@ public class Player implements Comparable<Player> {
         return abilityList;
     }
 
+    public void onInDangering(GameEngine e, InDangerSettlement settlement) {
+        List<AbilityBase> abilities = allAbilities().stream()
+                .filter(ab -> ab.canActive(e, InDangerEvent.InDangering, settlement.getPlayer()))
+                .toList();
+        e.batchQueryAbility(this, abilities, (ability) -> ability.onInDangering(e, settlement));
+    }
+
     public void onDDamaged(GameEngine engine, DamageSettlement settlement) {
         List<AbilityBase> abilities = allAbilities().stream()
-                .filter(ab -> ab.canActive(engine, DamageEvent.DDamaged, this))
+                .filter(ab -> ab.canActive(engine, DamageEvent.DDamaged, settlement.getSufferer()))
                 .toList();
         engine.batchQueryAbility(this, abilities, (ability) -> ability.onDDamaged(engine, settlement));
     }
 
     public void onLeavingDiscardPhase(GameEngine e, Player currentPlayer) {
         List<AbilityBase> abilities = allAbilities().stream()
-                .filter(ab -> ab.canActive(e, PhaseEvent.LeavingDiscardPhase, this))
+                .filter(ab -> ab.canActive(e, PhaseEvent.LeavingDiscardPhase, currentPlayer))
                 .toList();
         e.batchQueryAbility(this, abilities, (ability) -> ability.onLeavingDiscardPhase(e, this));
     }
@@ -191,6 +199,7 @@ public class Player implements Comparable<Player> {
     }
     public void acquireEquip(GameEngine e, CardTransferContext ctc, List<GearCardBase> cards) {
         //TODO add alarm
+        cards.forEach(c -> c.updateOwner(this));
         equips.addAll(cards);
     }
     public void updateHeroActive(int index, boolean active) {
@@ -235,9 +244,10 @@ public class Player implements Comparable<Player> {
                 handToRemove.add(card);
             }
         }
-        for (CardBase card : equips) {
+        for (GearCardBase card : equips) {
             if (cardSet.contains(card)) {
                 equipToRemove.add(card);
+                card.updateOwner(null);
             }
         }
         hands.removeAll(handToRemove);

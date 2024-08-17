@@ -12,7 +12,7 @@ import lombok.Setter;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class CardJudgeSettlement extends CardSettlement {
+public class CardJudgeSettlement extends SettlementBase {
     @Getter
     private Player user;
     @Getter

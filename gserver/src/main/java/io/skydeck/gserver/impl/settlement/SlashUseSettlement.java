@@ -19,6 +19,8 @@ public class SlashUseSettlement extends CardSettlement {
     private Map<Player, Integer> jinkQueryCountMap = new HashMap<>();
     @Getter
     private Set<Player> ignoreArmorSet = new HashSet<>();
+    @Getter
+    private Set<Player> disableHeroRevealingSet = new HashSet<>();
 
     private Set<Player> jinkSuccessSet = new HashSet<>();
 

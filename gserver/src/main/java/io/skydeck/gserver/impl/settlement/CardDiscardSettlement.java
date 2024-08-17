@@ -4,13 +4,14 @@ import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
+import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardLostType;
 import lombok.Getter;
 
 import java.util.List;
 
-public class CardDiscardSettlement extends CardSettlement {
+public class CardDiscardSettlement extends SettlementBase {
     @Getter
     private CardDiscardDTO discardDTO;
     public static CardDiscardSettlement newOne(CardDiscardDTO discardDTO) {
