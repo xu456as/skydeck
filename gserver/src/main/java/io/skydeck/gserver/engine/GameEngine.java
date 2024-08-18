@@ -77,6 +77,19 @@ public class GameEngine {
         }
     }
 
+    public int sameKingCount(Player player) {
+        int count = 1;
+        for (Player p : players) {
+            if (p.isDead() || p == player) {
+                continue;
+            }
+            if (p.getKingdom() != player.getKingdom()) {
+                continue;
+            }
+            count += 1;
+        }
+        return player.kingdomVolMod(this, count);
+    }
     public int distance(Player offender, Player defender) {
         return PositionUtil.distance(offender, defender, players);
     }
@@ -91,7 +104,7 @@ public class GameEngine {
             case Slash:
                 if (offender == currentPlayer && currentPhase == Phase.ActivePhase) {
                     StageState stageState = offender.getStageState();
-                    if (stageState.getUseSlashCount() >= offender.slashQuota()) {
+                    if (stageState.getUseSlashCount() >= offender.slashQuota(this)) {
                         return false;
                     }
                 }
@@ -391,6 +404,7 @@ public class GameEngine {
 
     public void onDying(DeceaseSettlement settlement) {
     }
+
 
     public void onStart() {
         for (Player player : PositionUtil.positionSort(currentPlayer, players)) {

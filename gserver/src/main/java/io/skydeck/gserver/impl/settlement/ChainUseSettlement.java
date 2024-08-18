@@ -19,6 +19,6 @@ public class ChainUseSettlement extends PloyCardSettlement {
         commonResolve(e, this::bizResolve);
     }
     private void bizResolve(GameEngine e, Player target) {
-        target.setChained(!target.isChained());
+        target.updateChain(e, !target.isChained());
     }
 }

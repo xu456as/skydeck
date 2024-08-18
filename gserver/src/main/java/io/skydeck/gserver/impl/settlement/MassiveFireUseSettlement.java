@@ -18,7 +18,7 @@ public class MassiveFireUseSettlement extends PloyCardSettlement {
     }
     private void bizResolve(GameEngine e, Player target) {
         DamageSettlement settlement =
-                DamageSettlement.newOne(useDTO.getPlayer(), target, 1, DamageNature.Fire, useDTO.getCard());
+                DamageSettlement.newOne(useDTO.getPlayer(), target, 1, DamageNature.Fire, useDTO.getCard(), this);
         e.runSettlement(settlement);
     }
 }

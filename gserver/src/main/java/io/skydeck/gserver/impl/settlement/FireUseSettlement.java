@@ -30,7 +30,7 @@ public class FireUseSettlement extends PloyCardSettlement {
         if (cardDiscardDTO != null) {
             e.runSettlement(CardDiscardSettlement.newOne(cardDiscardDTO));
             e.runSettlement(DamageSettlement.newOne(useDTO.getPlayer(), target,
-                    1, useDTO.getCard().nature(), useDTO.getCard()));
+                    1, useDTO.getCard().nature(), useDTO.getCard(), this));
         }
     }
     @Override

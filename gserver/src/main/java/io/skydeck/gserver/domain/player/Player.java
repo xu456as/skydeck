@@ -21,7 +21,6 @@ import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -115,11 +114,11 @@ public class Player implements Comparable<Player> {
                 .max(Integer::compareTo)
                 .orElse(1);
     }
-    public int slashQuota() {
+    public int slashQuota(GameEngine e) {
         List<AbilityBase> abs = allAbilities();
         int val = stageState.getSlashQuota();
         for (AbilityBase ab : abs) {
-            val = ab.slashQuotaMod(val);
+            val = ab.slashQuotaMod(e, val);
         }
         return val;
     }
@@ -187,9 +186,9 @@ public class Player implements Comparable<Player> {
         engine.batchQueryAbility(this, abilities, (ability) -> ability.onDDamaged(engine, settlement));
     }
 
-    public Suit cardSuitMod(CardBase card) {
+    public Suit cardSuitMod(GameEngine e, CardBase card) {
         for (AbilityBase ab : allAbilities()) {
-            Suit suit = ab.cardSuitMod(card);
+            Suit suit = ab.cardSuitMod(e, card);
             if (suit != card.suit()) {
                 return suit;
             }
@@ -210,8 +209,10 @@ public class Player implements Comparable<Player> {
     }
     public void acquireEquip(GameEngine e, CardTransferContext ctc, List<GearCardBase> cards) {
         //TODO add alarm
+        cards.forEach(c -> c.onEnteringEquipArea(e, this));
         cards.forEach(c -> c.updateOwner(this));
         equips.addAll(cards);
+        cards.forEach(c -> c.onEnteredEquipArea(e, this));
     }
     public void updateHeroActive(int index, boolean active) {
         switch (index) {
@@ -233,6 +234,17 @@ public class Player implements Comparable<Player> {
         }
         if (delta != 0) {
             e.onHealthChanged(this, delta);
+        }
+    }
+    public void updateChain(GameEngine e, boolean chained) {
+        for (AbilityBase ab : allAbilities()) {
+            if (!ab.onUpdatingChained(e, this)) {
+                return;
+            }
+        }
+        this.chained = chained;
+        for (AbilityBase ab : allAbilities()) {
+           ab.onUpdatedChained(e, this);
         }
     }
 
@@ -258,7 +270,9 @@ public class Player implements Comparable<Player> {
         for (GearCardBase card : equips) {
             if (cardSet.contains(card)) {
                 equipToRemove.add(card);
+                card.onLeavingEquipArea(e, this);
                 card.updateOwner(null);
+                card.onLeavedEquipArea(e, this);
             }
         }
         hands.removeAll(handToRemove);
@@ -292,5 +306,12 @@ public class Player implements Comparable<Player> {
 
     public boolean ignoreDistance(Player defender, CardBase card) {
         return allAbilities().stream().anyMatch(ab -> ab.ignoreDistance(defender, card));
+    }
+
+    public int kingdomVolMod(GameEngine e, int original) {
+        for (AbilityBase ab : allAbilities()) {
+            original = ab.kingdomVolMod(e, original);
+        }
+        return original;
     }
 }

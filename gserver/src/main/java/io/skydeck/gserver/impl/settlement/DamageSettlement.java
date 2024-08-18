@@ -14,14 +14,16 @@ public class DamageSettlement extends SettlementBase {
     private CardBase card;
     private int damageCount;
     private DamageNature nature;
+    private SettlementBase parent;
 
-    public static DamageSettlement newOne(Player dealer, Player sufferer, int amount, DamageNature nature, CardBase card) {
+    public static DamageSettlement newOne(Player dealer, Player sufferer, int amount, DamageNature nature, CardBase card, SettlementBase parent) {
         DamageSettlement settlement = new DamageSettlement();
         settlement.dealer = dealer;
         settlement.sufferer = sufferer;
         settlement.damageCount = amount;
         settlement.nature = nature;
         settlement.card = card;
+        settlement.parent = parent;
         return settlement;
     }
 

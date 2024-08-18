@@ -1,2 +1,4 @@
 reframe ability method parameters #done
 implement slash logic with new data
+uniform broadcast event
+design interaction system

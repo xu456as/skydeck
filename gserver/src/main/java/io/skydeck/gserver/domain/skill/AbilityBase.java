@@ -101,11 +101,16 @@ public abstract class AbilityBase {
     public void onAlcoholLimitCheck() {
     }
 
-    public int slashQuotaMod(int original) {
+    public int slashQuotaMod(GameEngine e, int original) {
+        return original;
+    }
+    public int kingdomVolMod(GameEngine e, int original) {
         return original;
     }
 
-    public Suit cardSuitMod(CardBase original) {
+    public int handQuotaMod(GameEngine e, int original) {return original;}
+
+    public Suit cardSuitMod(GameEngine e, CardBase original) {
         return original.suit();
     }
 
@@ -216,6 +221,12 @@ public abstract class AbilityBase {
     }
     public int defensePoint() {
         return 0;
+    }
+
+    public void onUpdatedChained(GameEngine e, Player player) {
+    }
+    public boolean onUpdatingChained(GameEngine e, Player player) {
+        return true;
     }
 
 

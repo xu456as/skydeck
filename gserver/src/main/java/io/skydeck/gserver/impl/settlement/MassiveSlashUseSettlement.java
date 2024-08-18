@@ -27,7 +27,7 @@ public class MassiveSlashUseSettlement extends PloyCardSettlement {
             e.runSettlement(CardSacrificeSettlement.newOne(sacrificeDTO));
         } else {
             DamageSettlement settlement = DamageSettlement.newOne(useDTO.getPlayer(), target,
-                    1, DamageNature.Normal, useDTO.getCard());
+                    1, DamageNature.Normal, useDTO.getCard(), this);
             e.runSettlement(settlement);
         }
     }

@@ -48,7 +48,7 @@ public class DuelUseSettlement extends PloyCardSettlement {
             if (end) {
                 e.runSettlement(DamageSettlement.newOne(duelers[(ans + 1) % 2], duelers[ans],
                         1, useDTO.getCard().nature(),
-                        useDTO.getCard()));
+                        useDTO.getCard(), this));
             } else {
                 ++ans;
             }

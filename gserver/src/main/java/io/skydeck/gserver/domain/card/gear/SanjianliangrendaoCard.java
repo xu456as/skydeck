@@ -100,7 +100,7 @@ public class SanjianliangrendaoCard extends GearCardBase {
                 return;
             }
             engine.runSettlement(CardDiscardSettlement.newOne(dto));
-            engine.runSettlement(DamageSettlement.newOne(settlement.getDealer(), target, 1, DamageNature.Normal, null));
+            engine.runSettlement(DamageSettlement.newOne(settlement.getDealer(), target, 1, DamageNature.Normal, null, engine.currentSettlement()));
         }
     }
 }

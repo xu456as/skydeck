@@ -55,7 +55,7 @@ public class HuWeiSkill extends SkillBase {
                 break;
             case 1:
                 engine.runSettlement(
-                        DamageSettlement.newOne(player, target, 1, DamageNature.Normal, null)
+                        DamageSettlement.newOne(player, target, 1, DamageNature.Normal, null, engine.currentSettlement())
                 );
                 break;
         }

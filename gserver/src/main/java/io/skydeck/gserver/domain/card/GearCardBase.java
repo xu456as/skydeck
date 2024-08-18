@@ -22,8 +22,10 @@ public abstract class GearCardBase extends CardBase {
     public List<SkillBase> skills() { return Collections.emptyList(); }
     public List<AbilityBase> abilities() { return Collections.emptyList(); }
 
-    public void onEnteringGearArea(GameEngine engine, Player player) {}
-    public void onLeavingGearArea(GameEngine engine, Player player) {}
+    public void onEnteringEquipArea(GameEngine engine, Player player) {}
+    public void onEnteredEquipArea(GameEngine engine, Player player) {}
+    public void onLeavingEquipArea(GameEngine engine, Player player) {}
+    public void onLeavedEquipArea(GameEngine engine, Player player) {}
     public void onBurying(GameEngine engine, Player player) {}
 
     public void updateOwner(Player owner) {

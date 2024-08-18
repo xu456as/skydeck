@@ -24,6 +24,7 @@ public class SlashUseSettlement extends CardSettlement {
     private Set<Player> disableHeroRevealingSet = new HashSet<>();
 
     private Set<Player> jinkSuccessSet = new HashSet<>();
+    @Getter
     private DamageNature damageNature;
 
     public static SlashUseSettlement newOne(CardUseDTO useDTO) {
@@ -92,7 +93,7 @@ public class SlashUseSettlement extends CardSettlement {
         int drunkDamage = (useDTO.getPlayer().getStageState().getDrunk()) ? 1 : 0;
         DamageSettlement damageSettlement = DamageSettlement.newOne(useDTO.getPlayer(),
                 target, damageCountMap.getOrDefault(target, 1) + drunkDamage,
-                useDTO.getCard().nature(), useDTO.getCard());
+                useDTO.getCard().nature(), useDTO.getCard(), this);
         damageSettlement.resolve(engine);
     }
 

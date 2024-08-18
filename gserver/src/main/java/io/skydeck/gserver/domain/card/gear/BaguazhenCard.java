@@ -65,7 +65,7 @@ public class BaguazhenCard extends GearCardBase {
 
             @Override
             public void accept(CardBase card) {
-                Suit suit = owner.cardSuitMod(card);
+                Suit suit = owner.cardSuitMod(e, card);
                 if (suit.color() == Color.Red) {
                     DynamicCardManager dcm = e.getDynamicCardManager();
                     if (proactiveActionDTO.getActiveCheck().getCardDisposeType() == CardDisposeType.Use) {

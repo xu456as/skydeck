@@ -46,7 +46,7 @@ public class SkipDrawPloySettlement extends PloyCardSettlement {
 
         @Override
         public void accept(CardBase judgeResult) {
-            if (target.cardSuitMod(judgeResult) != Suit.Club) {
+            if (target.cardSuitMod(e, judgeResult) != Suit.Club) {
                 target.getStageState().setSkipNextDrawPhase(true);
             }
         }

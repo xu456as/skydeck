@@ -3,6 +3,7 @@ package io.skydeck.gserver.domain.card.gear;
 import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.GearCardBase;
 import io.skydeck.gserver.domain.skill.AbilityBase;
+import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardNameType;
 
 import java.util.Collections;
@@ -30,7 +31,7 @@ public class ZhugeliannuCard extends GearCardBase {
         }
 
         @Override
-        public int slashQuotaMod(int original) {
+        public int slashQuotaMod(GameEngine e, int original) {
             return original + 999;
         }
     }
