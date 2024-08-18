@@ -2,20 +2,14 @@ package io.skydeck.gserver.domain.card.gear;
 
 import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.GearCardBase;
-import io.skydeck.gserver.domain.dto.CardDiscardDTO;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.domain.skill.AbilityBase;
 import io.skydeck.gserver.engine.GameEngine;
-import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.CardNameType;
-import io.skydeck.gserver.enums.CardSubType;
 import io.skydeck.gserver.enums.CardUseEvent;
-import io.skydeck.gserver.enums.InDangerEvent;
-import io.skydeck.gserver.impl.settlement.CardDiscardSettlement;
-import io.skydeck.gserver.impl.settlement.DamageSettlement;
-import io.skydeck.gserver.impl.settlement.InDangerSettlement;
 import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 
 import java.util.Collections;
@@ -51,8 +45,8 @@ public class QinglongyanjuedaoCard extends GearCardBase {
         }
 
         @Override
-        public boolean canActive(GameEngine engine, Enum event, Player player) {
-            return activeOnTargeted(engine, event, player);
+        public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
+            return activeOnTargeted(engine, event, activeCheck.getSubject());
         }
         private boolean activeOnTargeted(GameEngine engine, Enum event, Player player) {
             SettlementBase currentSettlement = engine.currentSettlement();

@@ -2,6 +2,7 @@ package io.skydeck.gserver.domain.skill;
 
 import io.skydeck.gserver.annotation.AbilityName;
 import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.engine.GameEngine;
@@ -35,8 +36,8 @@ public class JianXiongSkill extends SkillBase {
     }
 
     @Override
-    public boolean canActive(GameEngine engine, Enum event, Player player) {
-        return player == owner && events().contains(event);
+    public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
+        return activeCheck.getSubject() == owner && events().contains(event);
     }
 
     @Override

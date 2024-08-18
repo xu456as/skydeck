@@ -2,6 +2,7 @@ package io.skydeck.gserver.domain.card.gear;
 
 import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.GearCardBase;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
@@ -34,15 +35,15 @@ public class QinggangjianCard extends GearCardBase {
             return QinggangjianCard.this.name();
         }
         @Override
-        public boolean canActive(GameEngine engine, Enum event, Player player) {
+        public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
             SettlementBase currentSettlement = engine.currentSettlement();
             if (!(currentSettlement instanceof SlashUseSettlement slashUseSettlement)) {
                 return false;
             }
-            if (player != slashUseSettlement.getUseDTO().getPlayer()) {
+            if (activeCheck.getSubject() != slashUseSettlement.getUseDTO().getPlayer()) {
                 return false;
             }
-            return event == CardUseEvent.OTargeted && player.getEquips().contains(QinggangjianCard.this);
+            return event == CardUseEvent.OTargeted && activeCheck.getSubject().getEquips().contains(QinggangjianCard.this);
         }
         @Override
         public boolean mandatory() {

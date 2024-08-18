@@ -61,4 +61,6 @@ public class CardFilterFactory {
     public CardFilterIface gearFilter() {
         return (CardBase card) -> card.type() == CardType.Gear;
     }
+
+    public CardFilterIface rideFilter() {return (CardBase  card) -> card.subType() == CardSubType.DefenseRide || card.subType() == CardSubType.OffenseRide || card.subType() == CardSubType.SpecialRide;}
 }

@@ -3,8 +3,7 @@ package io.skydeck.gserver.domain.card.gear;
 import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.GearCardBase;
-import io.skydeck.gserver.domain.dto.CardDiscardDTO;
-import io.skydeck.gserver.domain.dto.CardTransferContext;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
@@ -13,9 +12,6 @@ import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.*;
 import io.skydeck.gserver.i18n.TextDictionary;
-import io.skydeck.gserver.impl.settlement.CardDiscardSettlement;
-import io.skydeck.gserver.impl.settlement.DamageSettlement;
-import io.skydeck.gserver.impl.settlement.InDangerSettlement;
 import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 
 import java.util.Collections;
@@ -43,11 +39,11 @@ public class ZhuqueyushanCard extends GearCardBase {
         }
         @Override
         public Set<Enum> events() {
-            return Collections.singleton(CardUseEvent.OTargeted);
+            return Collections.singleton(CardUseEvent.Using);
         }
         @Override
-        public boolean canActive(GameEngine engine, Enum event, Player player) {
-            return activeOnUsing(engine, event, player);
+        public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
+            return activeOnUsing(engine, event, activeCheck.getSubject());
         }
         private boolean activeOnUsing(GameEngine engine, Enum event, Player player) {
             SettlementBase currentSettlement = engine.currentSettlement();

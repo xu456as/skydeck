@@ -2,11 +2,13 @@ package io.skydeck.gserver.domain.skill;
 
 import io.skydeck.gserver.annotation.I18n;
 import io.skydeck.gserver.domain.card.CardBase;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.AbilityTag;
+import io.skydeck.gserver.enums.Suit;
 import io.skydeck.gserver.impl.settlement.DamageSettlement;
 import io.skydeck.gserver.impl.settlement.InDangerSettlement;
 import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
@@ -25,7 +27,7 @@ public abstract class AbilityBase {
     public Set<Enum> events() {
         return Collections.emptySet();
     }
-    public boolean canActive(GameEngine e, Enum event, Player player) {return false;}
+    public boolean canActive(GameEngine e, Enum event, ActiveCheckDTO activeCheck) {return false;}
     public boolean mandatory() {return false;}
 
     public String name() {
@@ -57,7 +59,8 @@ public abstract class AbilityBase {
     public void onDCardTargeted(GameEngine e, Player offender, Player defender, CardSettlement settlementBase) {
     }
 
-    public void onCardEffecting() {
+    public boolean onCardEffecting(CardSettlement settlement, Player target) {
+        return true;
     }
 
     public void onCardEffected() {
@@ -102,6 +105,10 @@ public abstract class AbilityBase {
         return original;
     }
 
+    public Suit cardSuitMod(CardBase original) {
+        return original.suit();
+    }
+
     public boolean ignoreDistance(Player target, CardBase card) {
         return false;
     }
@@ -120,6 +127,7 @@ public abstract class AbilityBase {
 
     public void onDistanceCheck() {
     }
+
 
     public void onEffectMuteCheck() {
     }

@@ -1,6 +1,7 @@
 package io.skydeck.gserver.impl.settlement;
 
 import io.skydeck.gserver.annotation.I18n;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.skill.DynamicAbilityBase;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.PloyCardSettlement;
@@ -53,8 +54,8 @@ public class GainStageUseSettlement extends PloyCardSettlement {
         }
 
         @Override
-        public boolean canActive(GameEngine engine, Enum event, Player player) {
-            return events().contains(event) && player == target;
+        public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
+            return events().contains(event) && activeCheck.getSubject() == target;
         }
 
         @Override

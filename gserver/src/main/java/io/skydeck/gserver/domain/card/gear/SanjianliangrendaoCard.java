@@ -2,6 +2,7 @@ package io.skydeck.gserver.domain.card.gear;
 
 import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.GearCardBase;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
@@ -46,11 +47,11 @@ public class SanjianliangrendaoCard extends GearCardBase {
         }
 
         @Override
-        public boolean canActive(GameEngine engine, Enum event, Player player) {
+        public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
             if (events().contains(event)) {
                 return false;
             }
-            if (player != owner) {
+            if (activeCheck.getSubject() != owner) {
                 return false;
             }
             SettlementBase se = engine.currentSettlement();

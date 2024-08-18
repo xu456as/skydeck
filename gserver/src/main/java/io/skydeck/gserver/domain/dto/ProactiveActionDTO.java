@@ -10,6 +10,8 @@ import java.util.List;
 
 @Data
 public class ProactiveActionDTO {
+    private Enum event;
+    private ActiveCheckDTO activeCheck;
     private Player user;
     private List<CardBase> handSelected;
     private List<GearCardBase> equipSelected;

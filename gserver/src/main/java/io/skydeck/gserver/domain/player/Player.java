@@ -3,6 +3,7 @@ package io.skydeck.gserver.domain.player;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.DynamicCard;
 import io.skydeck.gserver.domain.card.GearCardBase;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.domain.hero.RuntimeHeroBase;
 import io.skydeck.gserver.domain.hero.StaticHeroBase;
@@ -146,7 +147,7 @@ public class Player implements Comparable<Player> {
 
     public void onJinkSucceed(GameEngine engine, SlashUseSettlement settlement, Player offender, Player defender) {
         List<AbilityBase> abilities = allAbilities().stream()
-                .filter(abilityBase -> abilityBase.canActive(engine, DuckEvent.JinkUseDuck, defender))
+                .filter(abilityBase -> abilityBase.canActive(engine, DuckEvent.JinkUseDuck, ActiveCheckDTO.subject(defender)))
                 .collect(Collectors.toList());
         engine.batchQueryAbility(this, abilities,
                 (ability) -> ability.onJinkSucceed(engine, settlement, offender, defender)
@@ -174,21 +175,31 @@ public class Player implements Comparable<Player> {
 
     public void onInDangering(GameEngine e, InDangerSettlement settlement) {
         List<AbilityBase> abilities = allAbilities().stream()
-                .filter(ab -> ab.canActive(e, InDangerEvent.InDangering, settlement.getPlayer()))
+                .filter(ab -> ab.canActive(e, InDangerEvent.InDangering, ActiveCheckDTO.subject(settlement.getPlayer())))
                 .toList();
         e.batchQueryAbility(this, abilities, (ability) -> ability.onInDangering(e, settlement));
     }
 
     public void onDDamaged(GameEngine engine, DamageSettlement settlement) {
         List<AbilityBase> abilities = allAbilities().stream()
-                .filter(ab -> ab.canActive(engine, DamageEvent.DDamaged, settlement.getSufferer()))
+                .filter(ab -> ab.canActive(engine, DamageEvent.DDamaged, ActiveCheckDTO.subject(settlement.getSufferer())))
                 .toList();
         engine.batchQueryAbility(this, abilities, (ability) -> ability.onDDamaged(engine, settlement));
     }
 
+    public Suit cardSuitMod(CardBase card) {
+        for (AbilityBase ab : allAbilities()) {
+            Suit suit = ab.cardSuitMod(card);
+            if (suit != card.suit()) {
+                return suit;
+            }
+        }
+        return card.suit();
+    }
+
     public void onLeavingDiscardPhase(GameEngine e, Player currentPlayer) {
         List<AbilityBase> abilities = allAbilities().stream()
-                .filter(ab -> ab.canActive(e, PhaseEvent.LeavingDiscardPhase, currentPlayer))
+                .filter(ab -> ab.canActive(e, PhaseEvent.LeavingDiscardPhase, ActiveCheckDTO.subject(currentPlayer)))
                 .toList();
         e.batchQueryAbility(this, abilities, (ability) -> ability.onLeavingDiscardPhase(e, this));
     }
@@ -258,7 +269,7 @@ public class Player implements Comparable<Player> {
 
     public void onCardLost(GameEngine e, Player player, Enum type) {
         List<AbilityBase> abList = allAbilities().stream()
-                .filter(ab -> ab.canActive(e, type, player))
+                .filter(ab -> ab.canActive(e, type, ActiveCheckDTO.subject(player)))
                 .toList();
         e.batchQueryAbility(this, abList, (ab) -> ab.onCardLost(e, type, player));
     }

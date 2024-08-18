@@ -46,7 +46,7 @@ public class SkipActivePloySettlement extends PloyCardSettlement {
 
         @Override
         public void accept(CardBase judgeResult) {
-            if (judgeResult.suit() != Suit.Heart) {
+            if (target.cardSuitMod(judgeResult) != Suit.Heart) {
                 target.getStageState().setSkipNextActivePhase(true);
             }
         }

@@ -3,18 +3,16 @@ package io.skydeck.gserver.domain.card.gear;
 import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.GearCardBase;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
-import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.domain.skill.AbilityBase;
-import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.*;
 import io.skydeck.gserver.i18n.TextDictionary;
 import io.skydeck.gserver.impl.settlement.CardDiscardSettlement;
 import io.skydeck.gserver.impl.settlement.DamageSettlement;
-import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,16 +43,16 @@ public class HanbingjianCard extends GearCardBase {
             return Collections.singleton(DamageEvent.ODamaging);
         }
         @Override
-        public boolean canActive(GameEngine engine, Enum event, Player player) {
+        public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
             SettlementBase currentSettlement = engine.currentSettlement();
             if (!(currentSettlement instanceof DamageSettlement dSettlement)) {
                 return false;
             }
             CardBase card = dSettlement.getCard();
-            if (card == null || card.subType() != CardSubType.Slash || player != dSettlement.getDealer()) {
+            if (card == null || card.subType() != CardSubType.Slash || activeCheck.getSubject() != dSettlement.getDealer()) {
                 return false;
             }
-            return event == DamageEvent.ODamaging && player.getEquips().contains(HanbingjianCard.this);
+            return event == DamageEvent.ODamaging && activeCheck.getSubject().getEquips().contains(HanbingjianCard.this);
         }
 
         @Override

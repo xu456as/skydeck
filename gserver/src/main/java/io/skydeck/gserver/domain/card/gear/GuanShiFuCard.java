@@ -2,10 +2,11 @@ package io.skydeck.gserver.domain.card.gear;
 
 import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.CardBase;
-import io.skydeck.gserver.domain.card.CardFilterIface;
 import io.skydeck.gserver.domain.card.GearCardBase;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.player.Player;
+import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.domain.skill.AbilityBase;
 import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.GameEngine;
@@ -38,8 +39,12 @@ public class GuanShiFuCard extends GearCardBase {
         }
 
         @Override
-        public boolean canActive(GameEngine engine, Enum event, Player player) {
-            return event == DuckEvent.JinkUseDuck && player.getEquips().contains(GuanShiFuCard.this);
+        public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
+            SettlementBase sBase = engine.currentSettlement();;
+            if (!(sBase instanceof SlashUseSettlement slashSettle)) {
+                return false;
+            }
+            return event == DuckEvent.JinkUseDuck && slashSettle.getUseDTO().getPlayer().getEquips().contains(GuanShiFuCard.this);
         }
 
         @Override
@@ -52,7 +57,7 @@ public class GuanShiFuCard extends GearCardBase {
                 return;
             }
             QueryManager queryManager = engine.getQueryManager();
-            CardFilterFactory  cff = engine.getCardFilterFactory();
+            CardFilterFactory cff = engine.getCardFilterFactory();
             CardDiscardDTO discardDTO = queryManager.cardDiscardQuery(
                     offender, 2, null, Collections.singletonList(this::filter));
             if (discardDTO == null) {

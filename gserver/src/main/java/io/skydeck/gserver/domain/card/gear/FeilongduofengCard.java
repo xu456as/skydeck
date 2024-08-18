@@ -3,13 +3,13 @@ package io.skydeck.gserver.domain.card.gear;
 import io.skydeck.gserver.annotation.CardExecMeta;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.GearCardBase;
+import io.skydeck.gserver.domain.dto.ActiveCheckDTO;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.domain.skill.AbilityBase;
-import io.skydeck.gserver.engine.CardFilterFactory;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.*;
@@ -46,8 +46,8 @@ public class FeilongduofengCard extends GearCardBase {
             return Collections.singleton(CardUseEvent.OTargeted);
         }
         @Override
-        public boolean canActive(GameEngine engine, Enum event, Player player) {
-            return activeOnTargeted(engine, event, player) || activeInDangering(engine, event, player);
+        public boolean canActive(GameEngine engine, Enum event, ActiveCheckDTO activeCheck) {
+            return activeOnTargeted(engine, event, activeCheck.getSubject()) || activeInDangering(engine, event, activeCheck.getSubject());
         }
         private boolean activeOnTargeted(GameEngine engine, Enum event, Player player) {
             SettlementBase currentSettlement = engine.currentSettlement();

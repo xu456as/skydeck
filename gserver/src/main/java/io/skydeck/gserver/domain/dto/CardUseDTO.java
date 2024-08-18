@@ -4,6 +4,7 @@ package io.skydeck.gserver.domain.dto;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.player.Player;
+import io.skydeck.gserver.domain.settlement.SettlementBase;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
@@ -11,6 +12,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 
 
 public class CardUseDTO {
@@ -27,7 +29,7 @@ public class CardUseDTO {
     private Object extraInfo;
     @Getter
     @Setter
-    private CardSettlement counterSettlement;
+    private SettlementBase counterSettlement;
 
     public CardUseDTO addTarget(Player target) {
         targets.put(target, 1);

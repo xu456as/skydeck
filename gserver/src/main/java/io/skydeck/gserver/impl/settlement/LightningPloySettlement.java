@@ -47,7 +47,7 @@ public class LightningPloySettlement extends PloyCardSettlement {
     private record Lightning(GameEngine e, Player user, CardUseDTO useDTO) implements Consumer<CardBase> {
         @Override
         public void accept(CardBase judgeResult) {
-            if (judgeResult.suit() == Suit.Spade) {
+            if (user.cardSuitMod(judgeResult) == Suit.Spade) {
                 if (judgeResult.number() >= 2 && judgeResult.number() <= 9) {
                     DamageSettlement settlement = DamageSettlement.newOne(null, user,
                             3, DamageNature.Lightning, useDTO.getCard());
