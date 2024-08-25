@@ -72,6 +72,7 @@ public class PositionUtil {
         if (CollectionUtils.isEmpty(targets)) {
             return Collections.emptyList();
         }
+        targets = new ArrayList<>(targets);
         Collections.sort(targets);
         List<Player> newList = new ArrayList<>(targets.size());
         int stIdx = 0;

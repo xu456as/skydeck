@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BaseStageState {
-    protected static Map<String, Field> FIELD_MAP;
+    protected static Map<String, Field> FIELD_MAP = new HashMap<>();
     protected static void buildFieldMap(Class<?> tClass) {
         Field[] fields = tClass.getDeclaredFields();
         Map<String, Field> fieldMap = new HashMap<>();
@@ -20,7 +20,7 @@ public class BaseStageState {
             field.setAccessible(true);
             fieldMap.put(field.getName(), field);
         }
-        FIELD_MAP = fieldMap;
+        FIELD_MAP.putAll(fieldMap);
     }
 
     public void resetDefault() throws Exception {

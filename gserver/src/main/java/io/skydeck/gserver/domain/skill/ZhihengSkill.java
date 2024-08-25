@@ -2,27 +2,28 @@ package io.skydeck.gserver.domain.skill;
 
 import io.skydeck.gserver.annotation.AbilityName;
 import io.skydeck.gserver.domain.card.CardBase;
-import io.skydeck.gserver.domain.card.DynamicCard;
-import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
-import io.skydeck.gserver.domain.dto.CardUseDTO;
+import io.skydeck.gserver.domain.dto.CardDiscardDTO;
+import io.skydeck.gserver.domain.dto.CardTransferContext;
 import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
 import io.skydeck.gserver.domain.player.Player;
-import io.skydeck.gserver.engine.DynamicCardManager;
 import io.skydeck.gserver.engine.GameEngine;
-import io.skydeck.gserver.enums.CardNameType;
-import io.skydeck.gserver.enums.CardSubType;
-import io.skydeck.gserver.enums.Color;
-import io.skydeck.gserver.enums.Suit;
-import io.skydeck.gserver.impl.settlement.CardSacrificeSettlement;
-import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
-import org.apache.commons.collections4.CollectionUtils;
+import io.skydeck.gserver.engine.PublicCardResManager;
+import io.skydeck.gserver.impl.settlement.CardDiscardSettlement;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @AbilityName("Zhiheng")
+@Slf4j
 public class ZhihengSkill extends SkillBase {
+    @Getter
+    @Setter
+    private boolean limitCheck = true;
     public ZhihengSkill(Player owner) {
         this.owner = owner;
     }
@@ -32,41 +33,33 @@ public class ZhihengSkill extends SkillBase {
         return "Zhiheng";
     }
 
-
     @Override
     public void proactiveAction(GameEngine engine, Player player, ProactiveActionDTO actionDTO) {
-        if (CollectionUtils.isNotEmpty(actionDTO.getJudgeSelected())) {
+        if (player.getHands().isEmpty() && player.getEquips().isEmpty()) {
             return;
         }
-        DynamicCardManager dynamicCardManager = engine.getDynamicCardManager();
-        List<CardBase> cards = new ArrayList<>();
-        cards.addAll(actionDTO.getHandSelected());
-        cards.addAll(actionDTO.getEquipSelected());
-        if (CollectionUtils.isEmpty(cards) || cards.size() > 1 || cards.get(0).color() != Color.Red) {
+        if (stageState.getUseCount() >= 1) {
             return;
         }
-        CardBase card = cards.get(0);
-        DynamicCard dCard = dynamicCardManager.convert(Collections.singletonList(card), CardNameType.Slash);
-        List<Player> targets = actionDTO.getTargets();
-        if (CollectionUtils.isEmpty(targets)) {
-            CardSacrificeDTO dto = new CardSacrificeDTO();
-            dto.setPlayer(player);
-            dto.setCard(dCard);
-            actionDTO.setOutput(CardSacrificeSettlement.newOne(dto));
-        } else if (targets.size() == 1) {
-            CardUseDTO cardUseDTO = new CardUseDTO();
-            Player target = targets.get(0);
-            if (engine.canSelectAsCardTarget(player, target, dCard)) {
-                cardUseDTO.setPlayer(player);
-                cardUseDTO.setCard(dCard);
-                cardUseDTO.addTarget(target);
-                actionDTO.setOutput(SlashUseSettlement.newOne(cardUseDTO));
-            }
+        List<CardBase> toDiscardCard = new ArrayList<>(Optional.ofNullable(actionDTO.getHandSelected()).orElse(Collections.emptyList()));
+        toDiscardCard.addAll(Optional.ofNullable(actionDTO.getEquipSelected()).orElse(Collections.emptyList()));
+        if (limitCheck && toDiscardCard.size() > player.getMaxHealth()) {
+            return;
         }
-    }
-
-    @Override
-    public boolean ignoreDistance(Player target, CardBase card) {
-        return card.subType() == CardSubType.Slash && card.suit() == Suit.Diamond;
+        CardDiscardSettlement discardSettlement = CardDiscardSettlement.newOne(
+                CardDiscardDTO.builder()
+                .offender(player)
+                .defender(player)
+                .card(toDiscardCard).build()
+        );
+        engine.runSettlement(discardSettlement);
+        PublicCardResManager pcr = engine.getPcrManager();
+        List<CardBase> cards = pcr.pollDeckTop(toDiscardCard.size());
+        player.acquireHand(engine, CardTransferContext.draw(), cards);
+        try {
+            stageState.incCount("useCount");
+        } catch (Exception e) {
+            log.error("can't incCount for useCount", e);
+        }
     }
 }

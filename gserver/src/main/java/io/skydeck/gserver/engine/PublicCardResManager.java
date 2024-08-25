@@ -12,8 +12,8 @@ import java.util.*;
 public class PublicCardResManager {
 
 //    head in ground list
-    private LinkedList<CardBase> deck;
-    private Set<CardBase> grave;
+    private LinkedList<CardBase> deck = new LinkedList<>();
+    private Set<CardBase> grave = new HashSet<>();
 
     public void addToGrave(GameEngine e, List<CardBase> cards) {
         List<CardBase> realCards = new ArrayList<>();
@@ -34,10 +34,16 @@ public class PublicCardResManager {
     }
 
     public List<CardBase> pollDeckTop(int number) {
+        if (number == 0) {
+            return Collections.emptyList();
+        }
         List<CardBase> list = new ArrayList<>();
         if (deck.size() <= number) {
             list.addAll(deck);
+            number -= list.size();
             deck.clear();
+            shuffle();
+            list.addAll(pollDeckTop(number));
         } else {
             Iterator<CardBase> it = deck.descendingIterator();
             for (int i = 0; i < number; i++) {

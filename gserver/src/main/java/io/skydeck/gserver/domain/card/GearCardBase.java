@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class GearCardBase extends CardBase {
+    protected Player owner;
     public boolean unique() {return false;}
     public int offensePoint() {
         return 0;
@@ -29,7 +30,12 @@ public abstract class GearCardBase extends CardBase {
     public void onLeavedEquipArea(GameEngine engine, Player player) {}
     public void onBurying(GameEngine engine, Player player) {}
 
+    public void onAbilityChanged(GameEngine engine, Player player) {
+
+    }
+
     public void updateOwner(Player owner) {
+        this.owner = owner;
         abilities().forEach(ab -> ab.setOwner(owner));
     }
 

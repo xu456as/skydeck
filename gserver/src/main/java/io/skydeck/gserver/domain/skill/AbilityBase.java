@@ -20,7 +20,8 @@ import java.util.Set;
 
 public abstract class AbilityBase {
     @Getter
-    private final AbilityStageState stageState = new AbilityStageState();
+    protected final AbilityStageState stageState = new AbilityStageState();
+
 
     protected Player owner = null;
     public Player owner() {return owner;}

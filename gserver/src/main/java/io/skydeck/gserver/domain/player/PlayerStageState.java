@@ -14,6 +14,8 @@ public class PlayerStageState extends BaseStageState {
     private Boolean inLimbo;
     @DValue("1")
     private Integer slashQuota;
+    @DValue("2")
+    private Integer drawQuota;
     @DValue("0")
     private Integer extraSlashTarget;
     @DValue("1")

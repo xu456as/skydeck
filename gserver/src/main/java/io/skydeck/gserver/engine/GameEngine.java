@@ -195,6 +195,14 @@ public class GameEngine {
         }
         for (Player player : players) {
             player.onPreStart(this);
+            try {
+                player.getStageState().resetDefault();
+                for (AbilityBase ab : player.allAbilities()) {
+                    ab.getStageState().resetDefault();
+                }
+            } catch (Exception e) {
+                log.error("reset stageState error, player:{}", player.getId(), e);
+            }
         }
         return true;
     }
@@ -204,6 +212,9 @@ public class GameEngine {
             player.onPostYield(this);
             try {
                 player.getStageState().resetDefault();
+                for (AbilityBase ab : player.allAbilities()) {
+                    ab.getStageState().resetDefault();
+                }
             } catch (Exception e) {
                 log.error("reset stageState error, player:{}", player.getId(), e);
             }
@@ -323,7 +334,7 @@ public class GameEngine {
 
     public List<CardBase> onCardLosing(Player player, Enum type, List<CardBase> cards) {
         //TODO
-        return null;
+        return cards;
     }
 
     public void onCardLost(Player player, Enum type, List<CardBase> cards) {

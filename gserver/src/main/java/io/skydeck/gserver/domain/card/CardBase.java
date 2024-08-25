@@ -107,4 +107,13 @@ public abstract class CardBase implements CardProperties, Comparable<CardBase> {
             throw new BizException("can't create card instance for clazz[%s]".formatted(tClass.getName()), e);
         }
     }
+    public static <T extends CardBase> T newSimple(Class<T> tClass, int id) {
+        try {
+            T card = tClass.getDeclaredConstructor().newInstance();
+            card.id = id;
+            return card;
+        } catch (Exception e) {
+            throw new BizException("can't create card instance for clazz[%s]".formatted(tClass.getName()), e);
+        }
+    }
 }

@@ -26,6 +26,10 @@ import java.util.stream.Collectors;
 
 @Data
 public class Player implements Comparable<Player> {
+
+    public static final int HERO_MASK_PRIMARY = 1;
+    public static final int HERO_MAST_VICE = 2;
+
     private int id;
     private String name;
     private int health;
@@ -119,6 +123,14 @@ public class Player implements Comparable<Player> {
         int val = stageState.getSlashQuota();
         for (AbilityBase ab : abs) {
             val = ab.slashQuotaMod(e, val);
+        }
+        return val;
+    }
+    public int drawQuota(GameEngine e) {
+        List<AbilityBase> abs = allAbilities();
+        int val = stageState.getDrawQuota();
+        for (AbilityBase ab : abs) {
+            val = ab.drawQuotaMod(e, val);
         }
         return val;
     }
@@ -249,6 +261,9 @@ public class Player implements Comparable<Player> {
     }
 
     public void removeCard(GameEngine e, List<CardBase> cards, CardLostType type) {
+        if (CollectionUtils.isEmpty(cards)) {
+            return;
+        }
         List<CardBase> handToRemove = new ArrayList<>();
         List<CardBase> equipToRemove = new ArrayList<>();
         Set<CardBase> cardSet = new HashSet<>();
