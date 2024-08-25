@@ -3,10 +3,10 @@ package io.skydeck.gserver.domain.skill;
 import io.skydeck.gserver.annotation.AbilityName;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.DynamicCard;
-import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.domain.dto.ProactiveActionDTO;
+import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.engine.DynamicCardManager;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.enums.CardNameType;
@@ -17,17 +17,19 @@ import io.skydeck.gserver.impl.settlement.CardSacrificeSettlement;
 import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-@AbilityName("WuSheng")
-public class WuShengSkill extends SkillBase {
-    public WuShengSkill(Player owner) {
+@AbilityName("Zhiheng")
+public class ZhihengSkill extends SkillBase {
+    public ZhihengSkill(Player owner) {
         this.owner = owner;
     }
 
     @Override
     public String name() {
-        return "WuSheng";
+        return "Zhiheng";
     }
 
 

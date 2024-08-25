@@ -12,12 +12,15 @@ import io.skydeck.gserver.enums.Suit;
 import io.skydeck.gserver.impl.settlement.DamageSettlement;
 import io.skydeck.gserver.impl.settlement.InDangerSettlement;
 import io.skydeck.gserver.impl.settlement.SlashUseSettlement;
+import lombok.Getter;
 
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
 public abstract class AbilityBase {
+    @Getter
+    private final AbilityStageState stageState = new AbilityStageState();
 
     protected Player owner = null;
     public Player owner() {return owner;}
@@ -107,6 +110,9 @@ public abstract class AbilityBase {
     public int kingdomVolMod(GameEngine e, int original) {
         return original;
     }
+    public int drawQuotaMod(GameEngine e, int original) {
+        return original;
+    }
 
     public int handQuotaMod(GameEngine e, int original) {return original;}
 
@@ -176,10 +182,10 @@ public abstract class AbilityBase {
     public void onPreEnterActivePhase() {
     }
 
-    public void onEnteringActivePhase() {
+    public void onEnteringActivePhase(GameEngine e, Player subject) {
     }
 
-    public void onLeavingActivePhase() {
+    public void onLeavingActivePhase(GameEngine e, Player subject) {
     }
 
     public void onPreEnterDiscardPhase() {
@@ -228,7 +234,7 @@ public abstract class AbilityBase {
     public boolean onUpdatingChained(GameEngine e, Player player) {
         return true;
     }
-
-
     //end extra attributes
+
+
 }

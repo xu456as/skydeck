@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class GearCardBase extends CardBase {
+    public boolean unique() {return false;}
     public int offensePoint() {
         return 0;
     }

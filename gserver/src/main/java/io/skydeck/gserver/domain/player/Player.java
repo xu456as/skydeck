@@ -32,7 +32,7 @@ public class Player implements Comparable<Player> {
     private int maxHealth;
     private RuntimeHeroBase primaryHero;
     private RuntimeHeroBase viceHero;
-    private StageState stageState;
+    private PlayerStageState stageState;
     private Gender gender = Gender.None;
     private boolean inDanger = false;
     private boolean dead = false;
@@ -59,7 +59,7 @@ public class Player implements Comparable<Player> {
         );
         this.primaryHero = RuntimeHeroBase.newOne(e, this, primaryHero);
         this.viceHero = RuntimeHeroBase.newOne(e, this, viceHero);
-        this.stageState = new StageState();
+        this.stageState = new PlayerStageState();
     }
 
     public void clearResource(GameEngine engine) {

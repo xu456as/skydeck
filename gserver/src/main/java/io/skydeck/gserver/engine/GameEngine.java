@@ -8,7 +8,7 @@ import io.skydeck.gserver.domain.dto.CardReframeDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.domain.player.Player;
-import io.skydeck.gserver.domain.player.StageState;
+import io.skydeck.gserver.domain.player.PlayerStageState;
 import io.skydeck.gserver.domain.settlement.CardSettlement;
 import io.skydeck.gserver.domain.settlement.SettlementBase;
 import io.skydeck.gserver.domain.skill.AbilityBase;
@@ -103,7 +103,7 @@ public class GameEngine {
         switch (card.nameType()) {
             case Slash:
                 if (offender == currentPlayer && currentPhase == Phase.ActivePhase) {
-                    StageState stageState = offender.getStageState();
+                    PlayerStageState stageState = offender.getStageState();
                     if (stageState.getUseSlashCount() >= offender.slashQuota(this)) {
                         return false;
                     }
@@ -113,7 +113,7 @@ public class GameEngine {
                 return offender == defender || defender.getHealth() <= 0;
             case Liquor:
                 if (offender == currentPlayer) {
-                    StageState stageState = offender.getStageState();
+                    PlayerStageState stageState = offender.getStageState();
                     if (stageState.getUseLiquorCount() >= stageState.getLiquorQuota()) {
                         return false;
                     }
