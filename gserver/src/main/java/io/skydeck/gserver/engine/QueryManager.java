@@ -8,6 +8,8 @@ import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.i18n.TextDictionary;
+import io.skydeck.gserver.interaction.CliInteraction;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,9 @@ import java.util.Map;
 public class QueryManager {
 
     private GameEngine engine;
+
+    @Resource
+    private CliInteraction cliInteraction;
 
     public QueryManager(@Lazy GameEngine engine) {
         this.engine = engine;
@@ -33,7 +38,17 @@ public class QueryManager {
 
 
     //TODO
-    public CardUseDTO cardUseQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
+    public CardUseDTO cardUseQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {
+        int index = cliInteraction.takeCardsInput(player.getHands());
+        if (index != -1){
+            CardBase card = player.getHands().get(index);
+            CardUseDTO dto = new CardUseDTO();
+            dto.setCard(card);
+            dto.setPlayer(player);
+            return dto;
+        }
+        return null;
+    }
     public CardSacrificeDTO cardSacrificeQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
     public CardDiscardDTO cardDiscardQuery(Player player, int count, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
     public Player playerTargetQuery(Player player, List<Player> options) {return null;}

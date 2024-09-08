@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.skydeck.gserver.GserverApplicationTests;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.GearCardBase;
+import io.skydeck.gserver.domain.card.basic.JinkCard;
 import io.skydeck.gserver.domain.card.basic.SlashCard;
 import io.skydeck.gserver.domain.card.gear.DinglanyemingzhuCard;
 import io.skydeck.gserver.domain.dto.CardTransferContext;
@@ -101,6 +102,32 @@ public class MainloopTest extends GserverApplicationTests {
         SlashUseSettlement settlement = SlashUseSettlement.newOne(dto);
         engine.runSettlement(settlement);
         Assert.isTrue(playerB.getHealth() == 4, "slash use error");
+    }
+    @Test
+    public void test4() throws Exception {
+        Player player = engine.getCurrentPlayer();
+        Player playerB = engine.getPlayers().stream().filter(p -> p != player).findFirst().orElse(null);
+        Assert.isTrue(playerB != null, "init players error");
+        List<CardBase> cards = new ArrayList<>() {{
+            add(CardBase.newSimple(SlashCard.class, 1));
+        }};
+        player.acquireHand(engine, CardTransferContext.draw(), cards);
+        cards = new ArrayList<>() {{
+            add(CardBase.newSimple(JinkCard.class, 1));
+        }};
+        playerB.acquireHand(engine, CardTransferContext.draw(), cards);
+        new Thread(() -> engine.mainLoop()).start();
+        CardUseDTO dto = new CardUseDTO();
+        dto.setPlayer(player);
+        dto.setCard(cards.get(0));
+        dto.getTargets().put(playerB, 1);
+        SlashUseSettlement settlement = SlashUseSettlement.newOne(dto);
+        engine.runSettlement(settlement);
+        if (playerB.getStageState().getUseCardCount() > 0) {
+            Assert.isTrue(playerB.getHealth() == 5, "slash use error");
+        } else {
+            Assert.isTrue(playerB.getHealth() == 4, "slash use error");
+        }
     }
 }
 
