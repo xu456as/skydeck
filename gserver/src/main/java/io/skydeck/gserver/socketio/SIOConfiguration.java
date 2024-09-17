@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class SocketIOConfiguration {
+public class SIOConfiguration {
     private SocketIOServer server;
     @Bean
     public SocketIOServer socketIOServer() throws Exception {

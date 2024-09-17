@@ -9,17 +9,24 @@ import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
 import io.skydeck.gserver.i18n.TextDictionary;
 import io.skydeck.gserver.interaction.CliInteraction;
+import io.skydeck.gserver.util.JsonUtil;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
+@Slf4j
 public class QueryManager {
 
+
     private GameEngine engine;
+
+    private LinkedBlockingQueue<String> inputQueue = new LinkedBlockingQueue();
 
     @Resource
     private CliInteraction cliInteraction;
@@ -36,6 +43,22 @@ public class QueryManager {
 
     public static final int AREA_ALL = AREA_OWN | AREA_JUDGE;
 
+    private <T> T awaitResponse(Class<T> tClass) {
+        String data = null;
+        while (true) {
+            try {
+                data = inputQueue.take();
+                break;
+            } catch (InterruptedException e) {
+                log.error("InterruptedException", e);
+            }
+        }
+        try {
+            return JsonUtil.INST.readValue(data, tClass);
+        } catch (Exception e) {
+            throw new RuntimeException("can't parse data, rawData:[%s]".formatted(data), e);
+        }
+    }
 
     //TODO
     public CardUseDTO cardUseQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {

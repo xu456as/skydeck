@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class GameEngine {
+    private String id = UUID.randomUUID().toString().replace("-", "");
     @Resource
     private CardSetReader cardSetReader;
     @Resource
@@ -43,6 +44,8 @@ public class GameEngine {
     private QueryManager queryManager;
     @Resource
     private DynamicCardManager dynamicCardManager;
+    @Resource
+    private NetworkInterface networkInterface;
     private Player currentPlayer;
     private List<Player> players;
     private volatile boolean activeEnd = false;
