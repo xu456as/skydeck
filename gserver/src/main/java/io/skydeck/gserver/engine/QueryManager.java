@@ -13,6 +13,7 @@ import io.skydeck.gserver.util.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
 @Slf4j
+@Scope("prototype")
 public class QueryManager {
 
 

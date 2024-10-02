@@ -5,6 +5,7 @@ import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.NetworkContext;
 import io.skydeck.gserver.engine.NetworkInterface;
 import io.skydeck.gserver.socketio.dto.InputContextDTO;
+import io.skydeck.gserver.socketio.dto.InputDTO;
 import io.skydeck.gserver.socketio.enums.SIOEventType;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -20,25 +21,28 @@ public class SIONetworkAdapter implements NetworkInterface {
     private SIOEventHandler eventHandler;
     @Resource
     private RoomManager roomManager;
-    private LinkedBlockingQueue<NetworkContext> notifyQueue = new LinkedBlockingQueue<>();
 
-    @Override
-    public void notifyInput(NetworkContext nc) {
-        if (nc == null) {
-            return;
-        }
-        notifyQueue.offer(nc);
-    }
 
     @Override
     public Object readInput(NetworkContext nc) {
         GameEngine e = nc.getGameEngine();
-        String roomId = roomManager.getRoomByEngine(e.getId());
+        String roomId = e.getId();
         if (StringUtils.isBlank(roomId)) {
-            throw new RuntimeException("can't find a room by engine[%s]".formatted(e.getId()));
+            throw new RuntimeException("can't find room[%s]".formatted(e.getId()));
         }
         sendNotify(nc, roomId);
-        return eventHandler.awaitInput();
+        Long inputId = null;
+        Integer playerId = null;
+        Object data = null;
+        while (inputId == null && playerId == null) {
+            try {
+                InputDTO inputDTO = eventHandler.awaitInput(roomId);
+                inputId = inputDTO.getInputContext().getInputId();
+                playerId = inputDTO.getInputContext().getPlayerId();
+                data = inputDTO.getData();
+            } catch (InterruptedException ignore) {}
+        }
+        return data;
     }
 
     private void sendNotify(NetworkContext nc, String roomId) {

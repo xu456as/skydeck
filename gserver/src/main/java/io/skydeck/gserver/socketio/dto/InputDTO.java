@@ -7,5 +7,5 @@ import lombok.Data;
 @Builder
 public class InputDTO {
     private InputContextDTO inputContext;
-    private String data;
+    private Object data;
 }

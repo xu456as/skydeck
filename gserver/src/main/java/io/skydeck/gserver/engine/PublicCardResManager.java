@@ -4,11 +4,13 @@ import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.DynamicCard;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.rng.core.source32.JDKRandom;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Component
+@Scope("prototype")
 public class PublicCardResManager {
 
 //    head in ground list

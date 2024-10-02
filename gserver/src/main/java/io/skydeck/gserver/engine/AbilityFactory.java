@@ -6,6 +6,7 @@ import io.skydeck.gserver.domain.player.Player;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
+@Scope("prototype")
 public class AbilityFactory implements ResourceLoaderAware {
     private ResourceLoader resourceLoader;
 

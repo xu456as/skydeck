@@ -3,6 +3,9 @@ package io.skydeck.gserver.socketio;
 import io.skydeck.gserver.engine.GameEngine;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,10 +14,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class RoomManager {
+public class RoomManager implements ApplicationContextAware {
+    private ApplicationContext applicationContext = null;
 
-    private volatile Map<String, String> user2RoomMap = new HashMap<>();
-    private ConcurrentHashMap<String, Room> roomMap = new ConcurrentHashMap<>();
+    private final Map<String, String> user2RoomMap = new HashMap<>();
+    private final ConcurrentHashMap<String, Room> roomMap = new ConcurrentHashMap<>();
 
     private synchronized void bindUser(String roomId, String userId) {
         if (user2RoomMap.containsKey(userId)) {
@@ -46,7 +50,8 @@ public class RoomManager {
         if (roomMap.containsKey(roomId)) {
             return roomMap.get(roomId);
         }
-        Room room = new Room(userId, roomId);
+        GameEngine e = applicationContext.getBean(GameEngine.class);
+        Room room = new Room(userId, roomId, e);
         roomMap.put(roomId, room);
         return room;
     }
@@ -67,7 +72,7 @@ public class RoomManager {
         }
     }
     public boolean roomExist(String roomId) {
-        return roomMap.contains(roomId);
+        return roomMap.containsKey(roomId);
     }
     public GameEngine getEngineByRoom(String roomId) {
         Room room = roomMap.get(roomId);
@@ -91,4 +96,8 @@ public class RoomManager {
     }
 
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

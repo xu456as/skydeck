@@ -30,14 +30,10 @@ public class SIOEventHandler {
     private RoomManager roomManager;
     @Resource
     private SocketIOServer socketIOServer;
-
-//    private Map<String, String> user2RoomMap = new HashMap<>();
-//    private Map<String, List<String>> room2UserListMap = new HashMap<>();
     private final Object mutex = new Object();
 
     @OnConnect
     public void onConnect(SocketIOClient client) {
-        // TODO Auto-generated method stub
         String sa = client.getRemoteAddress().toString();
         String clientIp = sa.substring(1, sa.indexOf(":")); // deviceIp
         log.info("client[{}] connected", clientIp);
@@ -55,9 +51,11 @@ public class SIOEventHandler {
             try {
                 if (!roomManager.roomExist(roomId)) {
                     r = roomManager.createRoom(roomId, userId);
-                    groupSent(roomId, RoomDestroyed.name());
+                    client.joinRoom(roomId);
+                    groupSent(roomId, RoomCreated.name());
                 } else {
                     r = roomManager.getRoom(roomId);
+                    client.joinRoom(roomId);
                 }
                 r.putUser(userId);
             } catch (Exception e) {
@@ -73,22 +71,21 @@ public class SIOEventHandler {
                 .restUsers(r.getUsers().keySet().stream().toList()).build();
         groupSent(roomId, UserJoined.name(), dto);
     }
-    private void groupSent(String roomId, String var1, Object... var2) {
-        socketIOServer.getRoomOperations(roomId).sendEvent(var1, var2);
-    }
 
     private void userLeaveRoom(SocketIOClient client, String userId) {
         boolean isCreator = false;
+        String roomId = null;
         try {
             Pair<Boolean, Room> pair = roomManager.unbindUser(userId);
             isCreator = pair.getLeft();
             Room room = pair.getRight();
-            String roomId = room == null ? "" : room.getRoomId();
+            roomId = room == null ? "" : room.getRoomId();
             List<String> userLeft = room == null ? Collections.emptyList() : room.getUsers().keySet().stream().toList();
             UserJoinedDTO dto = UserJoinedDTO.builder()
                     .userId(userId)
                     .roomId(roomId)
                     .restUsers(userLeft).build();
+
             groupSent(roomId, UserLeft.name(), dto);
             if (isCreator) {
                 roomManager.destroyRoom(roomId, userId);
@@ -97,6 +94,9 @@ public class SIOEventHandler {
         }catch (Exception e) {
             log.error("userLeaveRoom failed", e);
             client.sendEvent(ConnectError.name(), "", "userLeaveRoom failed");
+        }
+        if (roomId != null) {
+            client.leaveRoom(roomId);
         }
         client.disconnect();
     }
@@ -110,7 +110,6 @@ public class SIOEventHandler {
 
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
-        // TODO Auto-generated method stub
         String sa = client.getRemoteAddress().toString();
         String clientIp = sa.substring(1, sa.indexOf(":"));// 获取设备ip
         log.info("client[{}] disconnected", clientIp);
@@ -129,7 +128,7 @@ public class SIOEventHandler {
         }
     }
     @OnEvent(value = "BizInput")
-    public void onBizInput(SocketIOClient client, AckRequest ackRequest, InputContextDTO context, String data) {
+    public void onBizInput(SocketIOClient client, AckRequest ackRequest, InputContextDTO context, Object data) {
         String roomId = getHandshakeParam(client, "roomId");
         String userId = getHandshakeParam(client, "userId");
         if (StringUtils.isBlank(roomId) || StringUtils.isBlank(userId)) {
@@ -142,27 +141,24 @@ public class SIOEventHandler {
                 .inputContext(context)
                 .data(data)
                 .build();
-        inputQueue.offer(dto);
-//        System.out.println(context);
-//        System.out.println(data);
+        Room room = roomManager.getRoom(roomId);
+        if (room != null) {
+            room.getInputQueue().offer(dto);
+        }
     }
 
-    @OnEvent(value = "test")
-    public void onEvent(SocketIOClient client, AckRequest ackRequest, String data) {
-        // 客户端推送advert_info事件时，onData接受数据，这里是string类型的json数据，还可以为Byte[],object其他类型
-        String sa = client.getRemoteAddress().toString();
-        String clientIp = sa.substring(1, sa.indexOf(":"));// 获取客户端连接的ip
-        Map<String, List<String>> params = client.getHandshakeData().getUrlParams();// 获取客户端url参数
-        System.out.println(clientIp + "：客户端：************" + data);
-//        JSONObject gpsData = (JSONObject) JSONObject.parse(data);
-//        String userIds = gpsData.get("userName") + "";
-//        String taskIds = gpsData.get("password") + "";
-        client.sendEvent("text1", "后台得到了数据");
+
+    private void groupSent(String roomId, String var1, Object... var2) {
+        socketIOServer.getRoomOperations(roomId).sendEvent(var1, var2);
     }
 
-    private LinkedBlockingQueue<InputDTO> inputQueue = new LinkedBlockingQueue<>();
-    public Object awaitInput() {
-        //todo
+    public InputDTO awaitInput(String roomId) throws InterruptedException {
+        Room room = roomManager.getRoom(roomId);
+        if (room != null) {
+            return room.getInputQueue().take();
+        }
         return null;
     }
+
+
 }

@@ -19,6 +19,7 @@ import jakarta.annotation.Resource;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @Data
 @Log4j2
 @Component
+@Scope("prototype")
 public class GameEngine {
     private String id = UUID.randomUUID().toString().replace("-", "");
     @Resource
@@ -45,7 +47,7 @@ public class GameEngine {
     @Resource
     private DynamicCardManager dynamicCardManager;
     @Resource
-    private NetworkInterface networkInterface;
+    private NetworkInterface network;
     private Player currentPlayer;
     private List<Player> players;
     private volatile boolean activeEnd = false;

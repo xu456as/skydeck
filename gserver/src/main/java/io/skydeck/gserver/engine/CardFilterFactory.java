@@ -5,12 +5,14 @@ import io.skydeck.gserver.domain.card.CardFilterIface;
 import io.skydeck.gserver.enums.CardSubType;
 import io.skydeck.gserver.enums.CardType;
 import io.skydeck.gserver.enums.Suit;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.function.Function;
 
 @Component
+@Scope("prototype")
 public class CardFilterFactory {
     public CardFilterIface newFilter(Function<CardBase, Boolean> func) {
         return func::apply;
