@@ -1,14 +1,17 @@
 package io.skydeck.gserver.socketio;
 
 import com.corundumstudio.socketio.SocketIOServer;
+import com.fasterxml.jackson.databind.JavaType;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.NetworkContext;
 import io.skydeck.gserver.engine.NetworkInterface;
 import io.skydeck.gserver.socketio.dto.InputContextDTO;
 import io.skydeck.gserver.socketio.dto.InputDTO;
 import io.skydeck.gserver.socketio.enums.SIOEventType;
+import io.skydeck.gserver.util.JsonUtil;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.asm.TypeReference;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.LinkedBlockingQueue;

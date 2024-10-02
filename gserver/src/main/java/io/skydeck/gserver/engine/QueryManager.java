@@ -1,5 +1,6 @@
 package io.skydeck.gserver.engine;
 
+import io.skydeck.gserver.domain.protocol.CardUseReq;
 import io.skydeck.gserver.domain.skill.AbilityBase;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.CardFilterIface;
@@ -7,6 +8,7 @@ import io.skydeck.gserver.domain.player.Player;
 import io.skydeck.gserver.domain.dto.CardDiscardDTO;
 import io.skydeck.gserver.domain.dto.CardSacrificeDTO;
 import io.skydeck.gserver.domain.dto.CardUseDTO;
+import io.skydeck.gserver.enums.NCInputType;
 import io.skydeck.gserver.i18n.TextDictionary;
 import io.skydeck.gserver.interaction.CliInteraction;
 import io.skydeck.gserver.util.JsonUtil;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
@@ -27,8 +30,6 @@ public class QueryManager {
 
 
     private GameEngine engine;
-
-    private LinkedBlockingQueue<String> inputQueue = new LinkedBlockingQueue();
 
     @Resource
     private CliInteraction cliInteraction;
@@ -45,34 +46,32 @@ public class QueryManager {
 
     public static final int AREA_ALL = AREA_OWN | AREA_JUDGE;
 
-    private <T> T awaitResponse(Class<T> tClass) {
-        String data = null;
-        while (true) {
-            try {
-                data = inputQueue.take();
-                break;
-            } catch (InterruptedException e) {
-                log.error("InterruptedException", e);
-            }
-        }
-        try {
-            return JsonUtil.INST.readValue(data, tClass);
-        } catch (Exception e) {
-            throw new RuntimeException("can't parse data, rawData:[%s]".formatted(data), e);
-        }
+    private NetworkContext newNC(Player player, NCInputType inputType) {
+        long currentEId = engine.getEventIncrementer().getAndIncrement();
+        return NetworkContext.builder().gameEngine(engine).inputId(currentEId).player(player).inputType(inputType).build();
     }
 
-    //TODO
+    //TODO implement filters
     public CardUseDTO cardUseQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {
-        int index = cliInteraction.takeCardsInput(player.getHands());
-        if (index != -1){
-            CardBase card = player.getHands().get(index);
-            CardUseDTO dto = new CardUseDTO();
-            dto.setCard(card);
-            dto.setPlayer(player);
-            return dto;
+        NetworkInterface network = engine.getNetwork();
+        NetworkContext nc = newNC(player, NCInputType.CardUse);
+        String data = (String) network.readInput(nc);
+        CardUseReq req;
+        try {
+            req = JsonUtil.INST.readValue(data, CardUseReq.class);
+        } catch (Exception e) {
+            throw new RuntimeException("can't read input data[%s]".formatted(data));
         }
-        return null;
+        CardUseDTO dto = new CardUseDTO();
+        dto.setPlayer(player);
+        dto.setCard(player.getCardById(req.getCardId()));
+        for (Integer tId : req.getTargets()) {
+            engine.getPlayers().stream()
+                    .filter(p -> Objects.equals(p.getId(), tId))
+                    .findFirst()
+                    .ifPresent(target -> dto.getTargets().put(target, 1));
+        }
+        return dto;
     }
     public CardSacrificeDTO cardSacrificeQuery(Player player, CardFilterIface allow, List<CardFilterIface> deny) {return null;}
     public CardDiscardDTO cardDiscardQuery(Player player, int count, CardFilterIface allow, List<CardFilterIface> deny) {return null;}

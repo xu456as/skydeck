@@ -329,4 +329,14 @@ public class Player implements Comparable<Player> {
         }
         return original;
     }
+
+    public CardBase getCardById(int id) {
+        List<CardBase> cards = new ArrayList<>();
+        cards.addAll(hands);
+        cards.addAll(equips);
+        return cards.stream()
+                .filter(c -> Objects.equals(c.id(), id))
+                .findFirst()
+                .orElse(null);
+    }
 }

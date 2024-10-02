@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,8 @@ public class GameEngine {
     private Queue<CsBufferItem> csBuffer = new LinkedList<>();
     private Player gainStagePlayer = null;
     private Player roundPlayer = null;
+    private AtomicLong eventIncrementer = new AtomicLong(0);
+//    private volatile long currentEventId;
     public GameEngine() {
     }
 
