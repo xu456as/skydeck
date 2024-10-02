@@ -1,57 +1,94 @@
 package io.skydeck.gserver.socketio;
 
 import io.skydeck.gserver.engine.GameEngine;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class RoomManager {
-    private ConcurrentHashMap<String, String> engine2RoomMap = new ConcurrentHashMap<>();
-    private volatile Map<String, GameEngine> room2EngineMap = new HashMap<>();
-    private volatile Map<String, String> room2CreatorMap = new HashMap<>();
 
-
-    private volatile Map<String, String> user2PlayerMap = new HashMap<>();
-    private volatile Map<String, String> player2UserMap = new HashMap<>();
+    private volatile Map<String, String> user2RoomMap = new HashMap<>();
     private ConcurrentHashMap<String, Room> roomMap = new ConcurrentHashMap<>();
 
     private synchronized void bindUser(String roomId, String userId) {
-
-    }
-
-    public synchronized GameEngine createRoom(String roomId, String userId) {
-        if (room2EngineMap.containsKey(roomId)) {
-            return room2EngineMap.get(roomId);
+        if (user2RoomMap.containsKey(userId)) {
+            throw new RuntimeException("user[%s] has joined room[%s], can't join room[%s]"
+                    .formatted(userId, user2RoomMap.get(userId), roomId));
         }
-        GameEngine e = new GameEngine();
-        room2EngineMap.put(roomId, e);
-        engine2RoomMap.put(e.getId(), roomId);
-        room2CreatorMap.put(roomId, userId);
-        return e;
+        if (!roomMap.containsKey(roomId)) {
+            throw new RuntimeException("user[%s] has joined room[%s] because it's not found"
+                    .formatted(userId, roomId));
+        }
+        user2RoomMap.put(userId, roomId);
+        roomMap.get(roomId).putUser(userId);
     }
-    public GameEngine getEngineByRoom(String roomId) {
-        return room2EngineMap.get(roomId);
+    public synchronized Pair<Boolean, Room> unbindUser(String userId) {
+        if (!user2RoomMap.containsKey(userId)) {
+            throw new RuntimeException("user[%s] didn't join any room"
+                    .formatted(userId));
+        }
+        String roomId = user2RoomMap.get(userId);
+        Room room = roomMap.get(roomId);
+        if (room == null) {
+            return Pair.of(false, null);
+        }
+        room.getUsers().remove(userId);
+        return Pair.of(StringUtils.equals(room.getCreator(), userId), room);
     }
-    public String getRoomCreator(String roomId) {
-        return room2CreatorMap.getOrDefault(roomId, "");
-    }
-    public String getRoomByEngine(String engineId) {
-        return engine2RoomMap.getOrDefault(engineId, "");
+
+    public synchronized Room createRoom(String roomId, String userId) {
+        if (roomMap.containsKey(roomId)) {
+            return roomMap.get(roomId);
+        }
+        Room room = new Room(userId, roomId);
+        roomMap.put(roomId, room);
+        return room;
     }
     public synchronized void destroyRoom(String roomId, String userId) {
-        if (!room2EngineMap.containsKey(roomId)) {
+        if (!roomMap.containsKey(roomId)) {
             return;
         }
-        if (!room2CreatorMap.getOrDefault(roomId, "").equals(userId)) {
-            return;
+        Room room = roomMap.get(roomId);
+        if (StringUtils.equals(room.getCreator(), userId)) {
+            throw new RuntimeException(
+                    "user[%s] can't destroy room[%s] because of creator[%s] mismatch".formatted(
+                            userId, roomId, room.getCreator()));
         }
-        GameEngine e = room2EngineMap.get(roomId);
-        engine2RoomMap.remove(e.getId());
-        room2EngineMap.remove(roomId);
-        room2CreatorMap.remove(roomId);
+        roomMap.remove(roomId);
+        Set<String> users = room.getUsers().keySet();
+        for (String user : users) {
+            user2RoomMap.remove(user);
+        }
     }
+    public boolean roomExist(String roomId) {
+        return roomMap.contains(roomId);
+    }
+    public GameEngine getEngineByRoom(String roomId) {
+        Room room = roomMap.get(roomId);
+        if (room != null) {
+            return room.getEngine();
+        }
+        return null;
+    }
+    public String getRoomCreator(String roomId) {
+        Room room = roomMap.get(roomId);
+        if (room != null) {
+            return room.getCreator();
+        }
+        return null;
+    }
+    public Room getRoom(String roomId) {
+        return roomMap.get(roomId);
+    }
+    public String getRoomByEngine(String engineId) {
+        return engineId;
+    }
+
 
 }

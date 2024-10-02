@@ -14,6 +14,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -25,6 +26,8 @@ import static io.skydeck.gserver.socketio.enums.SIOEventType.*;
 @Component
 @Slf4j
 public class SIOEventHandler {
+    @Resource
+    private RoomManager roomManager;
     @Resource
     private SocketIOServer socketIOServer;
 
@@ -46,8 +49,19 @@ public class SIOEventHandler {
             client.disconnect();
             return;
         }
+        client.sendEvent(ConnectOk.name());
+        Room r = null;
         synchronized (mutex) {
-            if (!userJoinRoom(client, userId, roomId)) {
+            try {
+                if (!roomManager.roomExist(roomId)) {
+                    r = roomManager.createRoom(roomId, userId);
+                    groupSent(roomId, RoomDestroyed.name());
+                } else {
+                    r = roomManager.getRoom(roomId);
+                }
+                r.putUser(userId);
+            } catch (Exception e) {
+                log.error("user can't join this room", e);
                 client.sendEvent(ConnectError.name(), "", "user can't join this room");
                 client.disconnect();
                 return;
@@ -56,44 +70,35 @@ public class SIOEventHandler {
         UserJoinedDTO dto = UserJoinedDTO.builder()
                 .userId(userId)
                 .roomId(roomId)
-                .restUsers(user2RoomMap).build();
-        client.sendEvent(ConnectOk.name(), dto);
+                .restUsers(r.getUsers().keySet().stream().toList()).build();
+        groupSent(roomId, UserJoined.name(), dto);
     }
-    private boolean userJoinRoom(SocketIOClient client, String userId, String roomId) {
-        if (!user2RoomMap.containsKey(userId)) {
-            user2RoomMap.put(userId, roomId);
-            room2UserListMap.putIfAbsent(roomId, new ArrayList<>());
-            room2UserListMap.get(roomId).add(userId);
-            client.joinRoom(roomId);
+    private void groupSent(String roomId, String var1, Object... var2) {
+        socketIOServer.getRoomOperations(roomId).sendEvent(var1, var2);
+    }
+
+    private void userLeaveRoom(SocketIOClient client, String userId) {
+        boolean isCreator = false;
+        try {
+            Pair<Boolean, Room> pair = roomManager.unbindUser(userId);
+            isCreator = pair.getLeft();
+            Room room = pair.getRight();
+            String roomId = room == null ? "" : room.getRoomId();
+            List<String> userLeft = room == null ? Collections.emptyList() : room.getUsers().keySet().stream().toList();
             UserJoinedDTO dto = UserJoinedDTO.builder()
                     .userId(userId)
                     .roomId(roomId)
-                    .restUsers(user2RoomMap).build();
-            socketIOServer.getRoomOperations(roomId).sendEvent(UserJoined.name(),
-                    dto);
-            return true;
-        }
-        String oldRoomId = user2RoomMap.get(userId);
-        if (!oldRoomId.equals(roomId)) {
-            log.warn("user[{}] is in room[{}], can't join another room[{}]", userId, oldRoomId, roomId);
-            return false;
-        }
-        return true;
-    }
-    private void userLeaveRoom(String userId) {
-        String roomId = user2RoomMap.get(userId);
-        if (StringUtils.isBlank(roomId)) {
-            return;
-        }
-        List<String> userList = room2UserListMap.get(roomId);
-        if (CollectionUtils.isNotEmpty(userList)) {
-            userList.remove(userId);
-            if (userList.isEmpty()) {
-                room2UserListMap.remove(roomId);
+                    .restUsers(userLeft).build();
+            groupSent(roomId, UserLeft.name(), dto);
+            if (isCreator) {
+                roomManager.destroyRoom(roomId, userId);
+                groupSent(roomId, RoomDestroyed.name());
             }
+        }catch (Exception e) {
+            log.error("userLeaveRoom failed", e);
+            client.sendEvent(ConnectError.name(), "", "userLeaveRoom failed");
         }
-        user2RoomMap.remove(userId);
-
+        client.disconnect();
     }
     private String getHandshakeParam(SocketIOClient client, String key) {
         Map<String, List<String>> params = client.getHandshakeData().getUrlParams();
@@ -120,14 +125,8 @@ public class SIOEventHandler {
             return;
         }
         synchronized (mutex) {
-            userLeaveRoom(userId);
-            UserJoinedDTO dto = UserJoinedDTO.builder()
-                    .userId(userId)
-                    .roomId(roomId)
-                    .restUsers(user2RoomMap).build();
-            socketIOServer.getRoomOperations(roomId).sendEvent(UserLeft.name(), dto);
+            userLeaveRoom(client, userId);
         }
-        client.disconnect();
     }
     @OnEvent(value = "BizInput")
     public void onBizInput(SocketIOClient client, AckRequest ackRequest, InputContextDTO context, String data) {

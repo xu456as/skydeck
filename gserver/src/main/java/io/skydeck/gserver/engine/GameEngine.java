@@ -54,6 +54,8 @@ public class GameEngine {
     private Queue<CsBufferItem> csBuffer = new LinkedList<>();
     private Player gainStagePlayer = null;
     private Player roundPlayer = null;
+    public GameEngine() {
+    }
 
 //    private Queue<SettlementBase> settlementQueue;
 

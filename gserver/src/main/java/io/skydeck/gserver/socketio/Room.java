@@ -8,14 +8,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-@Builder
 public class Room {
     private String roomId;
     private String creator;
 
+    private GameEngine engine;
     private final Map<String, Integer/*playerId*/> users = new HashMap<>();
 
-    private final GameEngine engine = new GameEngine();
+
+    public Room(String creatorId, String roomId) {
+        this.creator = creatorId;
+        this.roomId = roomId;
+        this.engine = new GameEngine();
+        this.engine.setId(roomId);
+        putUser(creatorId);
+    }
 
     public Room putUser(String userId) {
         users.put(userId, -1);
