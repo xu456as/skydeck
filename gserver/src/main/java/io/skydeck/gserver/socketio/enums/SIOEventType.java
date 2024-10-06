@@ -6,6 +6,7 @@ public enum SIOEventType {
     UserJoined,
     UserLeft,
     NotifyInput,
+    NotifyFeedback,
     ConnectOk,
     ConnectError,
 }

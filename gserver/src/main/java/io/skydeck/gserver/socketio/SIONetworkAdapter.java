@@ -1,20 +1,17 @@
 package io.skydeck.gserver.socketio;
 
 import com.corundumstudio.socketio.SocketIOServer;
-import com.fasterxml.jackson.databind.JavaType;
 import io.skydeck.gserver.engine.GameEngine;
 import io.skydeck.gserver.engine.NetworkContext;
 import io.skydeck.gserver.engine.NetworkInterface;
+import io.skydeck.gserver.enums.NetworkFeedbackType;
+import io.skydeck.gserver.socketio.dto.FeedbackContextDTO;
 import io.skydeck.gserver.socketio.dto.InputContextDTO;
 import io.skydeck.gserver.socketio.dto.InputDTO;
 import io.skydeck.gserver.socketio.enums.SIOEventType;
-import io.skydeck.gserver.util.JsonUtil;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.asm.TypeReference;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
 public class SIONetworkAdapter implements NetworkInterface {
@@ -33,7 +30,7 @@ public class SIONetworkAdapter implements NetworkInterface {
         if (StringUtils.isBlank(roomId)) {
             throw new RuntimeException("can't find room[%s]".formatted(e.getId()));
         }
-        sendNotify(nc, roomId);
+        sendInputNotify(nc, roomId);
         Long inputId = null;
         Integer playerId = null;
         Object data = null;
@@ -48,7 +45,26 @@ public class SIONetworkAdapter implements NetworkInterface {
         return data;
     }
 
-    private void sendNotify(NetworkContext nc, String roomId) {
+    @Override
+    public void feedback(NetworkContext nc, NetworkFeedbackType feedbackType, String message) {
+        GameEngine e = nc.getGameEngine();
+        String roomId = e.getId();
+        if (StringUtils.isBlank(roomId)) {
+            throw new RuntimeException("can't find room[%s]".formatted(e.getId()));
+        }
+        sendFeedbackNotify(nc, roomId, feedbackType, message);
+    }
+    private void sendFeedbackNotify(NetworkContext nc, String roomId, NetworkFeedbackType feedbackType, String message) {
+        FeedbackContextDTO dto = FeedbackContextDTO.builder()
+                .playerId(nc.getPlayer().getId())
+                .inputId(nc.getInputId())
+                .feedbackType(feedbackType)
+                .message(message)
+                .build();
+        socketIOServer.getRoomOperations(roomId).sendEvent(SIOEventType.NotifyFeedback.name(), dto);
+    }
+
+    private void sendInputNotify(NetworkContext nc, String roomId) {
         InputContextDTO dto = InputContextDTO.builder()
                 .playerId(nc.getPlayer().getId())
                 .inputId(nc.getInputId())

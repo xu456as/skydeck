@@ -12,4 +12,5 @@ public class NetworkContext {
     private long inputId;
     private Player player;
     private NCInputType inputType;
+    private Object info;
 }

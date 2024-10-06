@@ -4,6 +4,7 @@ public enum NCInputType {
     CardSelect,
     CardUse,
     CardSacrifice,
+    CardDiscard,
 
     OptionSelect,
     PlayerSelect,
