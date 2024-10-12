@@ -1,4 +1,4 @@
-package io.skydeck.gserver.domain.protocol;
+package io.skydeck.gserver.domain.protocol.request;
 
 import lombok.Data;
 

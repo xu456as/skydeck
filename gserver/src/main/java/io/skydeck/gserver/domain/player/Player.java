@@ -12,6 +12,7 @@ import io.skydeck.gserver.domain.skill.DynamicAbilityBase;
 import io.skydeck.gserver.domain.skill.SkillBase;
 import io.skydeck.gserver.domain.token.TokenBase;
 import io.skydeck.gserver.engine.GameEngine;
+import io.skydeck.gserver.engine.QueryManager;
 import io.skydeck.gserver.enums.*;
 import io.skydeck.gserver.exception.BizException;
 import io.skydeck.gserver.impl.settlement.DamageSettlement;
@@ -334,6 +335,19 @@ public class Player implements Comparable<Player> {
         List<CardBase> cards = new ArrayList<>();
         cards.addAll(hands);
         cards.addAll(equips);
+        return cards.stream()
+                .filter(c -> Objects.equals(c.id(), id))
+                .findFirst()
+                .orElse(null);
+    }
+    public CardBase getCardById(int id, int allowArea) {
+        List<CardBase> cards = new ArrayList<>();
+        if ((allowArea & QueryManager.AREA_HAND) != 0) {
+            cards.addAll(hands);
+        }
+        if ((allowArea & QueryManager.AREA_EQUIP) != 0) {
+            cards.addAll(equips);
+        }
         return cards.stream()
                 .filter(c -> Objects.equals(c.id(), id))
                 .findFirst()

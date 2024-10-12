@@ -1,4 +1,4 @@
-package io.skydeck.gserver.domain.protocol;
+package io.skydeck.gserver.domain.protocol.request;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,13 +7,13 @@ import java.util.List;
 
 @Data
 public class CardDiscardReq {
-    private Integer offenderId;
-    private Integer defenderId;
+    private Integer userId;
+    private Integer targetId;
     private List<Integer> cardIdList;
 
     @Data
     @Builder
-    public static class DiscardInfo {
+    public static class Info {
         private int discardCount;
     }
 }
