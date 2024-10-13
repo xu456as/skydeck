@@ -1,9 +1,6 @@
 package io.skydeck.gserver.engine;
 
-import io.skydeck.gserver.domain.protocol.request.CardDiscardReq;
-import io.skydeck.gserver.domain.protocol.request.CardSacrificeReq;
-import io.skydeck.gserver.domain.protocol.request.CardUseReq;
-import io.skydeck.gserver.domain.protocol.request.PlayerTargetReq;
+import io.skydeck.gserver.domain.protocol.request.*;
 import io.skydeck.gserver.domain.skill.AbilityBase;
 import io.skydeck.gserver.domain.card.CardBase;
 import io.skydeck.gserver.domain.card.CardFilter;
@@ -19,6 +16,7 @@ import io.skydeck.gserver.util.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -152,11 +150,11 @@ public class QueryManager {
             return null;
         }
         List<Integer> playerIds = options.stream().map(Player::getId).toList();
-        NetworkContext nc = newNC(player, NCInputType.PlayerSelect, PlayerTargetReq.Info.single(playerIds));
+        NetworkContext nc = newNC(player, NCInputType.PlayerSelect, PlayerSelectReq.Info.single(playerIds));
         int attempt = 0;
         notify(nc, NetworkFeedbackType.Query, "please enter your input");
         while (attempt++ < MAX_RETRY) {
-            PlayerTargetReq req = readRequest(nc, PlayerTargetReq.class);
+            PlayerSelectReq req = readRequest(nc, PlayerSelectReq.class);
             Player offender = engine.getPlayers().stream().filter(p -> Objects.equals(p.getId(), req.getUserId())).findFirst().orElse(null);
             List<Player> defenders = engine.getPlayers().stream().filter(p -> req.getTargetIds().contains(p.getId())).toList();
             if (offender == null || defenders.size() != 1) {
@@ -177,11 +175,11 @@ public class QueryManager {
             return Collections.emptyList();
         }
         List<Integer> playerIds = options.stream().map(Player::getId).toList();
-        NetworkContext nc = newNC(player, NCInputType.PlayerSelect, PlayerTargetReq.Info.multiple(playerIds));
+        NetworkContext nc = newNC(player, NCInputType.PlayerSelect, PlayerSelectReq.Info.multiple(playerIds));
         int attempt = 0;
         notify(nc, NetworkFeedbackType.Query, "please enter your input");
         while (attempt++ < MAX_RETRY) {
-            PlayerTargetReq req = readRequest(nc, PlayerTargetReq.class);
+            PlayerSelectReq req = readRequest(nc, PlayerSelectReq.class);
             Player offender = engine.getPlayers().stream().filter(p -> Objects.equals(p.getId(), req.getUserId())).findFirst().orElse(null);
             List<Player> defenders = engine.getPlayers().stream().filter(p -> req.getTargetIds().contains(p.getId())).toList();
             if (offender == null || CollectionUtils.isEmpty(defenders)) {
@@ -341,16 +339,16 @@ public class QueryManager {
         throw new RuntimeException("can't receive correct input");
     }
 
-    //TODO fix me
-    public CardBase pickOneCard(Player offender, Player defender, int allowArea) {
-        NetworkContext nc = newNC(player, NCInputType.CardSelect, CardDiscardReq.Info.builder().discardCount(count).build());
+    public CardBase pickOneCard(Player player, Player target, int allowArea) {
+        List<CardBase> cards = target.getCards(allowArea);
+        NetworkContext nc = newNC(player, NCInputType.CardSelect,
+                CardSelectReq.Info.single(cards));
         int attempt = 0;
         notify(nc, NetworkFeedbackType.Query, "please enter your input");
         while (attempt++ < MAX_RETRY) {
-            CardDiscardReq req = readRequest(nc, CardDiscardReq.class);
-            Player offender = engine.getPlayers().stream().filter(p -> Objects.equals(p.getId(), req.getUserId())).findFirst().orElse(null);
-            Player defender = engine.getPlayers().stream().filter(p -> Objects.equals(p.getId(), req.getTargetId())).findFirst().orElse(null);
-            if (offender == null || defender == null) {
+            CardSelectReq req = readRequest(nc, CardSelectReq.class);
+            List<Integer> cardIdList = req.getCardIdList();
+            if (CollectionUtils.isEmpty(cardIdList) || cardIdList.size() > 1) {
                 if (attempt <= MAX_RETRY) {
                     notify(nc, NetworkFeedbackType.Retry, "please retry your input");
                     continue;
@@ -359,84 +357,248 @@ public class QueryManager {
                     break;
                 }
             }
-            List<CardBase> cardDiscardList = new ArrayList<>();
-            boolean filterFail = false;
-            for (int i = 0; i < req.getCardIdList().size() && !filterFail; i++) {
-                Integer cardId = req.getCardIdList().get(i);
-                CardBase card = player.getCardById(cardId, AREA_HAND);
-                if(card == null) {
-                    filterFail = true;
-                    continue;
-                }
-                if (doFilter(card, allow, deny)) {
-                    filterFail = true;
-                    continue;
-                }
-                cardDiscardList.add(card);
-            }
-            if (filterFail) {
-                if (attempt <= MAX_RETRY) {
-                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
-                    continue;
-                } else {
-                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
-                    break;
-                }
-            }
-            CardDiscardDTO dto = CardDiscardDTO.builder()
-                    .offender(offender)
-                    .defender(defender)
-                    .card(cardDiscardList)
-                    .build();
-            return dto;
+            int targetId = cardIdList.get(0);
+            return cards.stream()
+                    .filter(c -> Objects.equals(c.id(), targetId))
+                    .findFirst()
+                    .orElse(null);
         }
         throw new RuntimeException("can't receive correct input");
     }
-    public CardBase pickOneCard(Player offender, Player defender, int allowArea, CardFilter allow) {
-        //TODO
-        return null;
+    public CardBase pickOneCard(Player player, Player target, int allowArea, CardFilter allow) {
+        List<CardBase> cards = target.getCards(allowArea);
+        NetworkContext nc = newNC(player, NCInputType.CardSelect,
+                CardSelectReq.Info.single(cards));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            CardSelectReq req = readRequest(nc, CardSelectReq.class);
+            List<Integer> cardIdList = req.getCardIdList();
+            int targetId = cardIdList.get(0);
+            CardBase card = cards.stream()
+                    .filter(c -> Objects.equals(c.id(), targetId))
+                    .findFirst()
+                    .orElse(null);
+            if (CollectionUtils.isEmpty(cardIdList) || cardIdList.size() > 1 || !doFilter(card, allow, null)) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            return card;
+        }
+        throw new RuntimeException("can't receive correct input");
     }
 
-    public int cardQuery(Player player, List<CardBase> cards) {
-        //TODO
-        return -1;
+    public CardBase pickOneCard(Player player, List<CardBase> cards) {
+        NetworkContext nc = newNC(player, NCInputType.CardSelect,
+                CardSelectReq.Info.single(cards));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            CardSelectReq req = readRequest(nc, CardSelectReq.class);
+            List<Integer> cardIdList = req.getCardIdList();
+            int targetId = cardIdList.get(0);
+            CardBase card = cards.stream()
+                    .filter(c -> Objects.equals(c.id(), targetId))
+                    .findFirst()
+                    .orElse(null);
+            if (CollectionUtils.isEmpty(cardIdList) || cardIdList.size() > 1) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            return card;
+        }
+        throw new RuntimeException("can't receive correct input");
+    }
+
+    public CardBase handCardPickQuery(Player player) {
+        return this.pickOneCard(player, player, QueryManager.AREA_HAND, null);
     }
 
     public AbilityBase abilitiesQuery(Player player, List<AbilityBase> abilityList) {
-        //TODO
-        return null;
+        if (CollectionUtils.isEmpty(abilityList)) {
+            return null;
+        }
+        List<String> title = abilityList.stream().map(AbilityBase::name).toList();
+        NetworkContext nc = newNC(player, NCInputType.OptionSelect,
+                OptionSelectReq.Info.single(title));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            OptionSelectReq req = readRequest(nc, OptionSelectReq.class);
+            List<Integer> indices = req.getOptIndices();
+            if (CollectionUtils.isEmpty(indices)) {
+                return null;
+            }
+            if (indices.size() > 1) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            int index = indices.get(0);
+            return abilityList.get(index);
+        }
+        throw new RuntimeException("can't receive correct input");
     }
     public int abilityOptionQuery(Player player, AbilityBase ability, TextDictionary... options) {
-        //TODO
-        return -1;
+        if (ArrayUtils.isEmpty(options)) {
+            return -1;
+        }
+        List<String> title = Arrays.stream(options).map(TextDictionary::i18n).toList();
+        NetworkContext nc = newNC(player, NCInputType.OptionSelect,
+                OptionSelectReq.Info.single(title));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            OptionSelectReq req = readRequest(nc, OptionSelectReq.class);
+            List<Integer> indices = req.getOptIndices();
+            if (CollectionUtils.isEmpty(indices)) {
+                return -1;
+            }
+            if (indices.size() > 1) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            return indices.get(0);
+        }
+        throw new RuntimeException("can't receive correct input");
+    }
+    public int abilityOptionQuery(Player player, AbilityBase ability, List<TextDictionary> options) {
+        if (CollectionUtils.isEmpty(options)) {
+            return -1;
+        }
+        List<String> title = options.stream().map(TextDictionary::i18n).toList();
+        NetworkContext nc = newNC(player, NCInputType.OptionSelect,
+                OptionSelectReq.Info.single(title));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            OptionSelectReq req = readRequest(nc, OptionSelectReq.class);
+            List<Integer> indices = req.getOptIndices();
+            if (CollectionUtils.isEmpty(indices)) {
+                return -1;
+            }
+            if (indices.size() > 1) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            return indices.get(0);
+        }
+        throw new RuntimeException("can't receive correct input");
     }
     public int optionQuery(Player player, String... options) {
-        //TODO
-        return -1;
+        if (ArrayUtils.isEmpty(options)) {
+            return -1;
+        }
+        List<String> title = Arrays.stream(options).toList();
+        NetworkContext nc = newNC(player, NCInputType.OptionSelect,
+                OptionSelectReq.Info.single(title));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            OptionSelectReq req = readRequest(nc, OptionSelectReq.class);
+            List<Integer> indices = req.getOptIndices();
+            if (CollectionUtils.isEmpty(indices)) {
+                return -1;
+            }
+            if (indices.size() > 1) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            return indices.get(0);
+        }
+        throw new RuntimeException("can't receive correct input");
     }
 
     public int optionQuery(Player player, List<String> options) {
-        //TODO
-        return -1;
+        if (CollectionUtils.isEmpty(options)) {
+            return -1;
+        }
+        List<String> title = options.stream().toList();
+        NetworkContext nc = newNC(player, NCInputType.OptionSelect,
+                OptionSelectReq.Info.single(title));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            OptionSelectReq req = readRequest(nc, OptionSelectReq.class);
+            List<Integer> indices = req.getOptIndices();
+            if (CollectionUtils.isEmpty(indices)) {
+                return -1;
+            }
+            if (indices.size() > 1) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            return indices.get(0);
+        }
+        throw new RuntimeException("can't receive correct input");
     }
     public int optionQuery(Player player, List<String> options, int optMask) {
-        //TODO
-        return -1;
+        //todo fix me
+        if (CollectionUtils.isEmpty(options)) {
+            return -1;
+        }
+        List<String> title = options.stream().toList();
+        NetworkContext nc = newNC(player, NCInputType.OptionSelect,
+                OptionSelectReq.Info.single(title));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            OptionSelectReq req = readRequest(nc, OptionSelectReq.class);
+            List<Integer> indices = req.getOptIndices();
+            if (CollectionUtils.isEmpty(indices)) {
+                return -1;
+            }
+            if (indices.size() > 1) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            return indices.get(0);
+        }
+        throw new RuntimeException("can't receive correct input");
     }
 
     public int optionQuery(Player player, Map<Integer, String> options) {
         //TODO
         return -1;
-    }
-
-    public int abilityOptionQuery(Player player, AbilityBase ability, List<TextDictionary> options) {
-        //TODO
-        return -1;
-    }
-
-    public CardBase handCardPickQuery(Player player) {
-        //TODO
-        return null;
     }
 
 }

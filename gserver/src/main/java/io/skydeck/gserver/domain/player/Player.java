@@ -353,4 +353,20 @@ public class Player implements Comparable<Player> {
                 .findFirst()
                 .orElse(null);
     }
+    public List<CardBase> getCards() {
+        List<CardBase> cards = new ArrayList<>();
+        cards.addAll(hands);
+        cards.addAll(equips);
+        return cards;
+    }
+    public List<CardBase> getCards(int allowArea) {
+        List<CardBase> cards = new ArrayList<>();
+        if ((allowArea & QueryManager.AREA_HAND) != 0) {
+            cards.addAll(hands);
+        }
+        if ((allowArea & QueryManager.AREA_EQUIP) != 0) {
+            cards.addAll(equips);
+        }
+        return cards;
+    }
 }

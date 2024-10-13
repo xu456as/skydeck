@@ -34,11 +34,10 @@ public class GroupThriveUseSettlement extends PloyCardSettlement {
             if (cards.isEmpty()) {
                 return;
             }
-            int idx = queryManager.cardQuery(target, cards);
-            CardBase card = cards.get(idx);
-            cards.remove(idx);
+            CardBase c = queryManager.pickOneCard(target, cards);
+            cards.remove(c);
             target.acquireHand(eng, CardTransferContext.builder().acquireWay(CardAcquireWay.SpecialDraw).build(),
-                    Collections.singletonList(card));
+                    Collections.singletonList(c));
         });
     }
 }
