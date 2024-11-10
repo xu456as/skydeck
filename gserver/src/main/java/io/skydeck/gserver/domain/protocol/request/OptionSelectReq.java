@@ -17,6 +17,7 @@ public class OptionSelectReq {
         private int minSelectCount;
         private int maxSelectCount;
         private List<String> optionList;
+        private int mask = 0XFFFFFFFF;
 
         public static Info single(List<String> optionList) {
             return Info.builder().minSelectCount(1).maxSelectCount(1).optionList(optionList).build();

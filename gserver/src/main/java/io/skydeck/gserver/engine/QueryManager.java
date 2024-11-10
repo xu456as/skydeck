@@ -16,7 +16,9 @@ import io.skydeck.gserver.util.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -572,13 +574,11 @@ public class QueryManager {
         throw new RuntimeException("can't receive correct input");
     }
     public int optionQuery(Player player, List<String> options, int optMask) {
-        //todo fix me
         if (CollectionUtils.isEmpty(options)) {
             return -1;
         }
-        List<String> title = options.stream().toList();
         NetworkContext nc = newNC(player, NCInputType.OptionSelect,
-                OptionSelectReq.Info.single(title));
+                OptionSelectReq.Info.builder().mask(optMask).optionList(options).minSelectCount(1).maxSelectCount(1));
         int attempt = 0;
         notify(nc, NetworkFeedbackType.Query, "please enter your input");
         while (attempt++ < MAX_RETRY) {
@@ -602,8 +602,37 @@ public class QueryManager {
     }
 
     public int optionQuery(Player player, Map<Integer, String> options) {
-        //TODO
-        return -1;
+        if (MapUtils.isEmpty(options)) {
+            return -1;
+        }
+        List<String> list = options.values().stream().toList();
+        NetworkContext nc = newNC(player, NCInputType.OptionSelect, OptionSelectReq.Info.single(list));
+        int attempt = 0;
+        notify(nc, NetworkFeedbackType.Query, "please enter your input");
+        while (attempt++ < MAX_RETRY) {
+            OptionSelectReq req = readRequest(nc, OptionSelectReq.class);
+            List<Integer> indices = req.getOptIndices();
+            if (CollectionUtils.isEmpty(indices)) {
+                return -1;
+            }
+            if (indices.size() > 1) {
+                if (attempt <= MAX_RETRY) {
+                    notify(nc, NetworkFeedbackType.Retry, "please retry your input");
+                    continue;
+                } else {
+                    notify(nc, NetworkFeedbackType.Retry, "can't receive correct input");
+                    break;
+                }
+            }
+            String val = list.get(indices.get(0));
+            for (Map.Entry<Integer, String> e : options.entrySet()) {
+                if (StringUtils.equals(val, e.getValue())) {
+                    return e.getKey();
+                }
+            }
+            return -1;
+        }
+        throw new RuntimeException("can't receive correct input");
     }
 
 }
