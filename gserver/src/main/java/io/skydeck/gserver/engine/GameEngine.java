@@ -536,7 +536,7 @@ public class GameEngine {
     public void batchQueryAbility(Player player, List<AbilityBase> abilities, Consumer<AbilityBase> action) {
         List<AbilityBase> abilityCol = new ArrayList<>(abilities);
         while (!abilityCol.isEmpty()) {
-            AbilityBase ability = queryManager.abilitiesQuery(player, abilityCol);
+            AbilityBase ability = queryManager.abilityQuery(player, abilityCol);
             if (ability == null) {
                 break;
             }

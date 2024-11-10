@@ -348,9 +348,26 @@ public class Player implements Comparable<Player> {
         if ((allowArea & QueryManager.AREA_EQUIP) != 0) {
             cards.addAll(equips);
         }
+        if ((allowArea & QueryManager.AREA_JUDGE) != 0) {
+            cards.addAll(judges);
+        }
         return cards.stream()
                 .filter(c -> Objects.equals(c.id(), id))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<CardBase> listCardsByArea(int allowArea) {
+        List<CardBase> cards = new ArrayList<>();
+        if ((allowArea & QueryManager.AREA_HAND) != 0) {
+            cards.addAll(hands);
+        }
+        if ((allowArea & QueryManager.AREA_EQUIP) != 0) {
+            cards.addAll(equips);
+        }
+        if ((allowArea & QueryManager.AREA_JUDGE) != 0) {
+            cards.addAll(judges);
+        }
+        return cards;
     }
 }
