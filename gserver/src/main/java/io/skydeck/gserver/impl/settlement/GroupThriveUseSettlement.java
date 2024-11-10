@@ -34,6 +34,7 @@ public class GroupThriveUseSettlement extends PloyCardSettlement {
             if (cards.isEmpty()) {
                 return;
             }
+
             int idx = queryManager.cardIndexQuery(target, cards);
             CardBase card = cards.get(idx);
             cards.remove(idx);

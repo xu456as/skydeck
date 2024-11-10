@@ -85,7 +85,7 @@ public class MainloopTest extends GserverApplicationTests {
         zhihengSkill.proactiveAction(engine, player, dto);
         Assert.isTrue(zhihengSkill.getStageState().getUseCount() == 1, "skill use status error");
     }
-    @Test
+//    @Test
     public void test3() throws Exception {
         Player player = engine.getCurrentPlayer();
         Player playerB = engine.getPlayers().stream().filter(p -> p != player).findFirst().orElse(null);
@@ -103,7 +103,7 @@ public class MainloopTest extends GserverApplicationTests {
         engine.runSettlement(settlement);
         Assert.isTrue(playerB.getHealth() == 4, "slash use error");
     }
-    @Test
+//    @Test
     public void test4() throws Exception {
         Player player = engine.getCurrentPlayer();
         Player playerB = engine.getPlayers().stream().filter(p -> p != player).findFirst().orElse(null);

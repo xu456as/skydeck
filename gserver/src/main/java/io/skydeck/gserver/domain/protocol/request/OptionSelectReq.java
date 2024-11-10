@@ -6,9 +6,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PlayerTargetReq {
+public class OptionSelectReq {
     private int userId;
-    private List<Integer> targetIds;
+    private List<Integer> optIndices;
 
     @Data
     @Builder
@@ -16,12 +16,12 @@ public class PlayerTargetReq {
 
         private int minSelectCount;
         private int maxSelectCount;
-        private List<Integer> optionList;
+        private List<String> optionList;
 
-        public static Info single(List<Integer> optionList) {
+        public static Info single(List<String> optionList) {
             return Info.builder().minSelectCount(1).maxSelectCount(1).optionList(optionList).build();
         }
-        public static Info multiple(List<Integer> optionList) {
+        public static Info multiple(List<String> optionList) {
             return Info.builder().minSelectCount(optionList.size()).maxSelectCount(optionList.size()).optionList(optionList).build();
         }
 
